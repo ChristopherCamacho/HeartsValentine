@@ -61,7 +61,7 @@ public class UserFileListAdapter extends BaseAdapter {
     }
 
     void loadFile(int i) {
-        String userFileFolder = MainActivity.getUserFileFolder(true);
+        String userFileFolder = MainActivity.getUserFileFolder(true, context);
 
         if (userFileFolder != null) {
             File usrFile = new File(userFileFolder + userFileList.get(i));
@@ -85,7 +85,7 @@ public class UserFileListAdapter extends BaseAdapter {
     }
 
     void deleteFile(int i) {
-        String userFileFolder = MainActivity.getUserFileFolder(true);
+        String userFileFolder = MainActivity.getUserFileFolder(true, context);
 
         if (userFileFolder != null) {
             File usrFile = new File(userFileFolder + userFileList.get(i));

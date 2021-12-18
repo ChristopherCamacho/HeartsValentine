@@ -1,4 +1,6 @@
 package com.example.heartsvalentine.hyphens;
+import android.content.Context;
+
 import com.example.heartsvalentine.MainActivity;
 
 import java.io.FileInputStream;
@@ -8,16 +10,18 @@ import java.util.Scanner;
 
 public class ResourceHyphenatePatternsLoader {
 	private final String hpl;
+	private final Context context;
 	private final List<String> patterns = new ArrayList<>();
 	private final List<String> exceptions = new ArrayList<>();
-	public ResourceHyphenatePatternsLoader(String hpl) {
+	public ResourceHyphenatePatternsLoader(String hpl, Context context) {
 		this.hpl = hpl;
+		this.context = context;
 	}
 		
 	public void load() {
 		
 		try {
-			String hyphenFileFolder = MainActivity.getHyphenFileFolder();
+			String hyphenFileFolder = MainActivity.getHyphenFileFolder(context);
 			if (hyphenFileFolder == null) {
 				throw new Exception("Hyphen folder not created.");
 			}

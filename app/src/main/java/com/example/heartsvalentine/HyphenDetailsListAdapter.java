@@ -49,10 +49,10 @@ public class HyphenDetailsListAdapter extends BaseAdapter {
     public View getView(final int i, View view, ViewGroup viewGroup) {
         view = hyphenDetailsInflater.inflate(R.layout.list_hyphen_items, null);
 
-        TextView hyphenFileNameView = (TextView) view.findViewById(R.id.textView);
+        TextView hyphenFileNameView = view.findViewById(R.id.textView);
         hyphenFileNameView.setText(hyphenDetails[i].getHyphenatePatternLanguage());
 
-        androidx.appcompat.widget.AppCompatButton downloadDeleteButton = (androidx.appcompat.widget.AppCompatButton) view.findViewById(R.id.button);
+        androidx.appcompat.widget.AppCompatButton downloadDeleteButton = view.findViewById(R.id.button);
 
         if (hyphenDetails[i].getDownLoaded()) {
             setButtonToDeleteStatus(downloadDeleteButton, hyphenFileNameView);
@@ -68,7 +68,7 @@ public class HyphenDetailsListAdapter extends BaseAdapter {
 
     void onDownloadDeleteButton(int i, androidx.appcompat.widget.AppCompatButton downloadDeleteButton, TextView hyphenFileNameView) {
         if (hyphenDetails[i].getDownLoaded()) {
-            String hyphenFileFolder = MainActivity.getHyphenFileFolder();
+            String hyphenFileFolder = MainActivity.getHyphenFileFolder(hyphenFileNameView.getContext());
 
             if (hyphenFileFolder != null) {
                 String hyphenFileName = hyphenFileFolder + hyphenDetails[i].getFileName();
@@ -144,7 +144,7 @@ public class HyphenDetailsListAdapter extends BaseAdapter {
                 }
 
                 if (downloaded) {
-                    String hyphenFileFolder = MainActivity.getHyphenFileFolder();
+                    String hyphenFileFolder = MainActivity.getHyphenFileFolder(hyphenFileNameView.getContext());
 
                     if (hyphenFileFolder != null) {
                         String hyphenFileName = hyphenFileFolder + hyphenDetails[idx].getFileName();

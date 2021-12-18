@@ -1,5 +1,6 @@
 package com.example.heartsvalentine.hearts;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -22,7 +23,7 @@ import com.example.heartsvalentine.hyphens.Hyphenator;
 
 final class DrawText {
 	
-	DrawText(Canvas g2d, MainSizes mainSizes, HeartDetails hd, TextFormattingDetails tfd) {
+	DrawText(Canvas g2d, MainSizes mainSizes, HeartDetails hd, TextFormattingDetails tfd, Context context) {
 		this.g2d = g2d;
 		this.mainSizes = mainSizes;
 		this.hd = hd;
@@ -32,7 +33,7 @@ final class DrawText {
 			if (HyphenatorLangMap.containsKey(tfd.gethyphenPatternLan())) {
 				this.hyphenator = HyphenatorLangMap.get(tfd.gethyphenPatternLan());
 			} else {
-				this.hyphenator = new Hyphenator(tfd.gethyphenPatternLan());
+				this.hyphenator = new Hyphenator(tfd.gethyphenPatternLan(), context);
 				HyphenatorLangMap.put(tfd.gethyphenPatternLan(), this.hyphenator);
 			}
 		}

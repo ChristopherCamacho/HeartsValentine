@@ -109,10 +109,14 @@ public class UserFiles extends Fragment {
 
             TextFormattingDetails tfd = new TextFormattingDetails(strTextInput, hvp.getOptimizeSpacing(), hvp.getHyphenateText(),
                     hvp.getHyphenFileName(), 50, 170, hvp.getTxtHeartsMargin(), hvp.getTextColor());
-            DrawHeartsValentine heartsValentine = new DrawHeartsValentine(tfd, hvp.getUseEmoji(), hvp.getHeartsColor(), hvp.getBackgroundColor(), hvp.getOuterMargin());
+            DrawHeartsValentine heartsValentine = new DrawHeartsValentine(tfd, hvp.getUseEmoji(), hvp.getHeartsColor(), hvp.getBackgroundColor(), hvp.getOuterMargin(), getContext());
             heartsValentine.computeTextFit(getContext());
+            Context context = getContext();
 
-            File userFile = new File(MainActivity.getUserFileFolder(true) + strFileName);
+            if (context == null)
+                throw new Exception("Context is null.");
+
+            File userFile = new File(MainActivity.getUserFileFolder(true, context) + strFileName);
             FileWriter writer = new FileWriter(userFile);
             writer.append(strTextInput);
             writer.flush();
@@ -129,6 +133,10 @@ public class UserFiles extends Fragment {
                     .setPositiveButton(android.R.string.ok, null)
                     .setIcon(android.R.drawable.alert_light_frame)
                     .show();
+        }
+        catch (Exception e) {
+            System.out.println("An error occurred in method UserFiles::saveFile.");
+            e.printStackTrace();
         }
     }
 

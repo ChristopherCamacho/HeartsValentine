@@ -11,12 +11,13 @@ import com.example.heartsvalentine.R;
 // https://stackoverflow.com/questions/27588965/how-to-use-custom-font-in-a-project-written-in-android-studio
 
 public class DrawHeartsValentine {
-	public DrawHeartsValentine(TextFormattingDetails tfd, boolean useEmoji, int heartColor, int backgroundColor, int margin) {
+	public DrawHeartsValentine(TextFormattingDetails tfd, boolean useEmoji, int heartColor, int backgroundColor, int margin, Context context) {
 		this.tfd = tfd;
 		mainSizes = new MainSizes(margin);
 		hd = new HeartDetails(useEmoji, heartColor);
 		this.backgroundColor = backgroundColor;
 		initialize();
+		this.context = context;
 	}
 	
 	private void initialize() {
@@ -51,7 +52,7 @@ public class DrawHeartsValentine {
 	private int textLenFromWidth(int width) {
 		//hd = new HeartDetails(/*canvas*/);
 		mainSizes.resetWidthHeightRadius(width);
-		dt = new DrawText(canvas, mainSizes, hd, tfd);
+		dt = new DrawText(canvas, mainSizes, hd, tfd, context);
 		return dt.computeTextSpaceAvailable();
 	}
   	
@@ -90,6 +91,7 @@ public class DrawHeartsValentine {
 	
 	public void computeTextFit(Context context) throws HeartsValException {
 		mainSizes.resetWidthHeightRadius(getWidthEstimateFromTextLen(pixelTxtLen));
+		this.context = context;
 
 		if (tfd.getContentText().length() == 0) {
 			throw new HeartsValException(context.getResources().getString(R.string.error_no_text));
@@ -114,7 +116,7 @@ public class DrawHeartsValentine {
 
 			bitmap = Bitmap.createBitmap(mainSizes.getWidth(), mainSizes.getHeight(), Bitmap.Config.ARGB_8888);
 			canvas = new Canvas(bitmap);
-			dt = new DrawText(canvas, mainSizes, hd, tfd);
+			dt = new DrawText(canvas, mainSizes, hd, tfd, context);
 
 			if (counter == 1) {
 				dt.resetTextInputDefails();
@@ -258,4 +260,5 @@ public class DrawHeartsValentine {
 	private static final int maxIterations = 300;
 	private static final int stepIncrement = 4;
 	private final int backgroundColor;
+	private Context context;
 }

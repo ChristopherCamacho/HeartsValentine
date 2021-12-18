@@ -2,8 +2,8 @@ package com.example.heartsvalentine;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 
 import com.example.heartsvalentine.viewModels.FileNameHplMapViewModel;
 import com.example.heartsvalentine.viewModels.HeartValParametersViewModel;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                         hyphenDetail.getString("fileName"),
                         hyphenDetail.getString("downloadLink"));
 
-                String hyphenFileFolder = getHyphenFileFolder();
+                String hyphenFileFolder = getHyphenFileFolder(getApplicationContext());
 
                 if (hyphenFileFolder != null) {
                     File hyphenFile = new File(hyphenFileFolder + hyphenDetail.getString("fileName"));
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> loadUserFile() {
         ArrayList<String> userFileList = new ArrayList<>();
 
-        String usrFilePath = getUserFileFolder(false);
+        String usrFilePath = getUserFileFolder(false, getApplicationContext());
 
         if (usrFilePath != null) {
             File userFilesFolder = new File(usrFilePath);
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadSavedSettings() throws IOException, JSONException {
-        String settingsFileName = getSettingsFileName();
+        String settingsFileName = getSettingsFileName(getApplicationContext());
         if (settingsFileName != null) {
             File settingsFile = new File(settingsFileName);
             if (settingsFile.exists()) {
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String readSavedSettingsFomFile() throws IOException {
-        String settingsFilePath = MainActivity.getSettingsFileName();
+        String settingsFilePath = MainActivity.getSettingsFileName(getApplicationContext());
 
         if (settingsFilePath != null) {
             File file = new File(settingsFilePath);
@@ -240,10 +240,9 @@ public class MainActivity extends AppCompatActivity {
         return json;
     }
 
-    public static String getHyphenFileFolder() {
+    public static String getHyphenFileFolder(Context context) {
         boolean folderCreated = true;
-        Environment.getExternalStorageDirectory();
-        File docDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File docDir = context.getFilesDir();
 
         String heartsValFolder = docDir.getPath() + "/HeartsVal";
         File heartsValDir = new File(heartsValFolder);
@@ -264,10 +263,9 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public static String getSettingsFileName() {
+    public static String getSettingsFileName(Context context) {
         boolean folderCreated = true;
-        Environment.getExternalStorageDirectory();
-        File docDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File docDir = context.getFilesDir();
 
         String heartsValFolder = docDir.getPath() + "/HeartsVal";
         File heartsValDir = new File(heartsValFolder);
@@ -288,10 +286,9 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public static String getUserFileFolder(boolean appendBackslash) {
+    public static String getUserFileFolder(boolean appendBackslash, Context context) {
         boolean folderCreated = true;
-        Environment.getExternalStorageDirectory();
-        File docDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File docDir = context.getFilesDir();
 
         String heartsValFolder = docDir.getPath() + "/HeartsVal";
         File heartsValDir = new File(heartsValFolder);

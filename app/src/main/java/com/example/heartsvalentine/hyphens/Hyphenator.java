@@ -1,5 +1,7 @@
 package com.example.heartsvalentine.hyphens;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,16 +9,16 @@ import java.util.Map;
 
 public class Hyphenator {
 
-	public Hyphenator(String language) {
-		loadPatterns(language);
+	public Hyphenator(String language, Context context) {
+		loadPatterns(language, context);
 		minLength = 5;
 		minLeading = 2;
 		minTrailing = 3;
 		endsMarker = '.';
 	}
 
-	private void loadPatterns(String language) {
-		ResourceHyphenatePatternsLoader rhl = new ResourceHyphenatePatternsLoader(language);
+	private void loadPatterns(String language, Context context) {
+		ResourceHyphenatePatternsLoader rhl = new ResourceHyphenatePatternsLoader(language, context);
 		rhl.load();
 
 		populatePatternsMapFromList(rhl.getPatterns());

@@ -303,7 +303,12 @@ public class Settings extends Fragment {
         try {
             JSONObject jsonObj = MainActivity.GetJSonObjectFromHeartValParameters(hvp);
             String hvpSettingsString = jsonObj.toString();
-            String settingsPathName = MainActivity.getSettingsFileName();
+            Context context = getContext();
+
+            if (context == null)
+                throw new Exception("getContext returned null.");
+
+            String settingsPathName = MainActivity.getSettingsFileName(getContext());
             if (settingsPathName != null) {
                 File file = new File(settingsPathName);
                 FileWriter fileWriter = new FileWriter(file);
@@ -328,21 +333,32 @@ public class Settings extends Fragment {
     }
 
     void deleteSettings() {
-        String settingsPathName = MainActivity.getSettingsFileName();
+        try {
+            Context context = getContext();
 
-        if (settingsPathName != null) {
-            File file = new File(settingsPathName);
-            if (file.exists()) {
-                if (file.delete() && getContext() != null) {
-                    new AlertDialog.Builder(getContext())
-                            .setTitle(getContext().getResources().getString(R.string.deleteSettings))
-                            .setMessage(getContext().getResources().getString(R.string.deleteSettingsInfo))
-                            .setCancelable(false)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setIcon(android.R.drawable.alert_light_frame)
-                            .show();
+            if (context == null)
+                throw new Exception("getContext returned null.");
+
+            String settingsPathName = MainActivity.getSettingsFileName(context);
+
+            if (settingsPathName != null) {
+                File file = new File(settingsPathName);
+                if (file.exists()) {
+                    if (file.delete() && getContext() != null) {
+                        new AlertDialog.Builder(getContext())
+                                .setTitle(getContext().getResources().getString(R.string.deleteSettings))
+                                .setMessage(getContext().getResources().getString(R.string.deleteSettingsInfo))
+                                .setCancelable(false)
+                                .setPositiveButton(android.R.string.ok, null)
+                                .setIcon(android.R.drawable.alert_light_frame)
+                                .show();
+                    }
                 }
             }
+        }
+        catch (Exception e) {
+            System.out.println("An error occurred in method saveSettings().");
+            e.printStackTrace();
         }
     }
 }
