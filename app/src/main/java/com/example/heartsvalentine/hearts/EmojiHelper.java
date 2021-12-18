@@ -5,13 +5,14 @@ import android.graphics.Paint;
 public class EmojiHelper {
     public static boolean isCharEmojiAtPos(String str, int pos) {
         char chr = str.charAt(pos);
-        return chr == 0xD83C || 0xD83D == chr;
+        return chr == 0xD83C || chr == 0xD83D || chr == 0xD83E;
     }
     // We already know we have an emoji
     public static int emojiLengthAtPos(String str, int pos) {
         int new_pos = pos + 2; // Length 2 is min
 
         boolean isCountryFlag = false; // Used country as in computing flag has a different meaning.
+        boolean activateSkinColorFilters = false;
 
         if (pos + 1 < str.length()) {
             char chr = str.charAt(pos + 1);
@@ -48,6 +49,18 @@ public class EmojiHelper {
                     else {
                         new_pos--;
                     }
+                    break;
+                }
+            }
+            else if (new_pos == pos + 2 && chr == 0xD83C) { // colored body parts handled here
+                new_pos++;
+                activateSkinColorFilters = true;
+            }
+            else if (activateSkinColorFilters) {
+                if (chr >= 0xDFFB && chr <= 0xDFFF) {
+                    new_pos++;
+                } else {
+                    new_pos--;
                     break;
                 }
             }
