@@ -5,11 +5,14 @@ import android.graphics.Paint;
 public class EmojiHelper {
     public static boolean isCharEmojiAtPos(String str, int pos) {
         char chr = str.charAt(pos);
-        return chr == 0xD83C || chr == 0xD83D || chr == 0xD83E;
+        // chr == 0x270D is an annoying exception - it's the writing hand that can be coloured like other emojis
+        // and has only 1 utf 8 character, instead of 2.
+        return chr == 0xD83C || chr == 0xD83D || chr == 0xD83E || chr == 0x270D;
     }
     // We already know we have an emoji
     public static int emojiLengthAtPos(String str, int pos) {
-        int new_pos = pos + 2; // Length 2 is min
+        final int pos_incr = (str.charAt(pos) == 0x270D)? pos + 1 : pos + 2; // Length 2 is min except for hand exception
+        int new_pos = pos_incr;
 
         boolean isCountryFlag = false; // Used country as in computing flag has a different meaning.
         boolean activateSkinColorFilters = false;
@@ -52,7 +55,7 @@ public class EmojiHelper {
                     break;
                 }
             }
-            else if (new_pos == pos + 2 && chr == 0xD83C) { // colored body parts handled here
+            else if (new_pos == pos_incr && chr == 0xD83C) { // colored body parts handled here
                 new_pos++;
                 activateSkinColorFilters = true;
             }
