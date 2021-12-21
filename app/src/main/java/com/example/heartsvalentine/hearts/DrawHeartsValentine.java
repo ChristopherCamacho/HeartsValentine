@@ -107,6 +107,7 @@ public class DrawHeartsValentine {
 		boolean smallDecrease = false;
 		boolean smallIncrease = false;
 		boolean bestOptimization = false;
+		canvas = new Canvas(bitmap);
 
 		do {
 			counter++;
@@ -114,8 +115,6 @@ public class DrawHeartsValentine {
 			if (mainSizes.getWidth() == 0 || mainSizes.getHeight() == 0)
 				throw new HeartsValException(context.getResources().getString(R.string.error_no_width_or_height));
 
-			bitmap = Bitmap.createBitmap(mainSizes.getWidth(), mainSizes.getHeight(), Bitmap.Config.ARGB_8888);
-			canvas = new Canvas(bitmap);
 			dt = new DrawText(canvas, mainSizes, hd, tfd, context);
 
 			if (counter == 1) {
@@ -165,11 +164,14 @@ public class DrawHeartsValentine {
 				}
 				increased = true;
 			}
-			if (!goodSize && counter < maxIterations) {
-				bitmap.recycle();
-			}
 		}
 		while (!goodSize && counter < maxIterations);
+
+		bitmap.recycle();
+		bitmap = Bitmap.createBitmap(mainSizes.getWidth(), mainSizes.getHeight(), Bitmap.Config.ARGB_8888);
+		canvas = new Canvas(bitmap);
+		dt = new DrawText(canvas, mainSizes, hd, tfd, context);
+		dt.computeTextPlacementDetails();
 	}
 	
 	public void draw() {
