@@ -59,6 +59,7 @@ public class EmojiHelper {
             else if (activateSkinColorFilters) {
                 if (chr >= 0xDFFB && chr <= 0xDFFF) {
                     new_pos++;
+                    activateSkinColorFilters = false;
                 } else {
                     new_pos--;
                     break;
