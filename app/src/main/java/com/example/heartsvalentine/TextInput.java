@@ -108,7 +108,8 @@ public class TextInput extends Fragment {
                 //MainActivity.setHeartValBitmap(heartsValentine.GetHeartValBitmapImage());
                 // generate image file in Pictures folder:
                 if (getActivity() != null) {
-                    MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), heartsValentine.GetHeartValBitmapImage(), "Hearts Valentine", null);
+                    String fileNsame = "HV-" + String.valueOf(System.currentTimeMillis());
+                    MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), heartsValentine.GetHeartValBitmapImage(), fileNsame, "Generated through Hearts Valentine.");
                 }
                 heartsValBitmapViewModel.selectItem(heartsValentine.GetHeartValBitmapImage());
 
