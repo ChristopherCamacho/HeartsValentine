@@ -7,7 +7,7 @@ public class HeartValParameters {
     private boolean hyphenateText = false;
     private int txtHeartsMargin = 20;
     private static final int maxTxtHeartsMargin = 50;
-    private int outerMargin = 0;
+    private int outerMargin = 15;
     private int textColor = 0xFF000000;
     private int heartsColor = 0xFFFF0000;
     private int backgroundColor =0xFFFFFFFF;

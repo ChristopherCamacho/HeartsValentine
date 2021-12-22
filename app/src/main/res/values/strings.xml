@@ -13,6 +13,7 @@
     <string name="download">Download</string>
     <string name="needToDownLoad">(Need to download)</string>
     <string name="delete">Delete</string>
+    <string name="remove">Remove</string>
     <string name="back">&#60; Back</string>
     <string name="hyphenate_switch">Hyphenate</string>
     <string name="optimize_spacing_switch">Optimize spacing</string>

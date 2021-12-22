@@ -186,7 +186,7 @@ public class HyphenDetailsListAdapter extends BaseAdapter {
 
     void setButtonToDeleteStatus(androidx.appcompat.widget.AppCompatButton downloadDeleteButton, TextView hyphenFileNameView) {
         downloadDeleteButton.setBackgroundColor(context.getResources().getColor(R.color.navyBlue));
-        downloadDeleteButton.setText(context.getResources().getString(R.string.delete));
+        downloadDeleteButton.setText(context.getResources().getString(R.string.remove));
         hyphenFileNameView.setTextColor(context.getResources().getColor(R.color.black));
         hyphenFileNameView.setTypeface(null, Typeface.BOLD);
     }

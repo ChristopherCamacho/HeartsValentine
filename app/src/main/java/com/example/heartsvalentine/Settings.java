@@ -51,6 +51,7 @@ public class Settings extends Fragment {
     HashMap<String, String> fileNameHplMap;
     HeartValParameters hvp;
     boolean neededToDownloadText = false;
+    boolean wasHyphenfileListEmpty;
     private FragmentActivity fragmentActivityContext;
 
     public Settings() {
@@ -262,11 +263,18 @@ public class Settings extends Fragment {
             needToDownloadText.setVisibility(View.VISIBLE);
             spinner.setVisibility(View.GONE);
             hyphenateSwitch.setVisibility(View.GONE);
+            wasHyphenfileListEmpty = true;
         } else {
             needToDownloadText.setVisibility(View.GONE);
             spinner.setVisibility(View.VISIBLE);
             hyphenateSwitch.setVisibility(View.VISIBLE);
             Context context = this.getContext();
+
+            // If the hyphenfile list was empty and has just been filled, we switch hyphenation on.
+            if (wasHyphenfileListEmpty) {
+                hyphenateSwitch.setChecked(true);
+            }
+            wasHyphenfileListEmpty = false;
 
             if (context != null) {
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(),
