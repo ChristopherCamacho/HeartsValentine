@@ -811,7 +811,7 @@ final class DrawText {
 						}
 					} else {
 						// g2d.drawChars(txt.toCharArray(), 0, txt.length(), txtBoundingRect.x, txtBoundingRect.y + txtBoundingRect.height - textDescent);
-						g2d.drawText(txt, (int) (txtBoundingRect.left), txtBoundingRect.top, paint);
+						g2d.drawText(txt, txtBoundingRect.left, txtBoundingRect.top, paint);
 					}
 				}
 			}	
@@ -845,9 +845,7 @@ final class DrawText {
 				// All rectangles used...
 				optimized = true;
 			}
-			else { 	
-				List<Integer> lastRectsWidths = new ArrayList<>();
-				
+			else {
 				while(li.hasPrevious()) {
 					previousRectWidth = lastRectWidth;
 					lastRectWidth = trd.getBoundingRect().width();
@@ -857,7 +855,6 @@ final class DrawText {
 						break;
 					}
 
-					lastRectsWidths.add(lastRectWidth);
 					trd = li.previous();
 					
 					if (trd.getTextWidth() > 0) {

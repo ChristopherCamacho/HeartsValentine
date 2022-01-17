@@ -1,6 +1,6 @@
 package com.example.heartsvalentine.hearts;
 
-public class TextLineDetails {
+public final class TextLineDetails {
 	TextLineDetails(String line) {
 		this.line = line;
 		allTextFits = false;

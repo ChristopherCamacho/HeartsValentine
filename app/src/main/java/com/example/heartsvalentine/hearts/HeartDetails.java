@@ -9,8 +9,7 @@ import android.graphics.Typeface;
 
 final class HeartDetails {
 	
-	HeartDetails(boolean useEmoji, /*Canvas canvas*/int heartColor) {
-		//this.canvas = canvas;
+	HeartDetails(boolean useEmoji, int heartColor) {
 		this.heartColor = heartColor;
 		this.useEmoji = useEmoji;
 		initialize();
@@ -156,7 +155,7 @@ final class HeartDetails {
 	boolean getUseEmoji(){ return useEmoji; }
 
 	//private final Canvas canvas;
-	private final String heart = Character.toString((char)0x2665);//"♥";//""♥";
+	private final String heart = Character.toString((char)0x2665);//"♥";
 	private float heartCenterX;
 	private float heartCenterY;
 	private float heartWidth;

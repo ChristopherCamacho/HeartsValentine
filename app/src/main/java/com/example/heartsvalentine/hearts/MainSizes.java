@@ -1,6 +1,6 @@
 package com.example.heartsvalentine.hearts;
 
-class MainSizes {
+final class MainSizes {
 
 	MainSizes(int margin) {
 		width = 0;

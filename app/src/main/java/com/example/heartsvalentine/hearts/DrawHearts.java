@@ -16,7 +16,7 @@ final class DrawHearts {
 		bottomAdjust = hd.getUseEmoji()? -33 : -2*hd.getHeartHeight();
 	}
 	
-	void computeSideHearts(int totalHeartCount, double distance, double startAngle, double beta, List<Point> heartsLst,
+	private void computeSideHearts(int totalHeartCount, double distance, double startAngle, double beta, List<Point> heartsLst,
 			Point ptCircleCentre, boolean left) {
 		double gamma = 2 * Math.asin(distance / (2 * mainSizes.getRadius())); // seems correct
 		int heartCount = 0;
@@ -80,7 +80,6 @@ final class DrawHearts {
 		paint.setTypeface(tf);
 		paint.setTextSize(150);
 		paint.setColor(hd.getColor());
-		//paint.setColor(Color.GRAY);
 
 		List<Point> heartsLst = new ArrayList<>();
 				
@@ -88,9 +87,6 @@ final class DrawHearts {
 		Point ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius() +  hd.getHeartCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() -  hd.getHeartCenterY()));
 
 		double startAngle = Math.acos((mainSizes.getWidth()/2.0 - ptLeftTopCircleCentre.x)/mainSizes.getRadius());
-		
-////////////////////////////////
-		
 		double vertDistBottomPt = mainSizes.getHeight() - 2 * mainSizes.getMargin() - mainSizes.getRadius(); // y-coordinate top circle centres - y coordinate of bottom of heart
 		double alpha = Math.atan(vertDistBottomPt/mainSizes.getRadius());
 		double phi = Math.atan(vertDistBottomPt/(mainSizes.getRadius()*Math.cos(startAngle)));

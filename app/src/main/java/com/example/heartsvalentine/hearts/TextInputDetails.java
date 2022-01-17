@@ -3,7 +3,7 @@ package com.example.heartsvalentine.hearts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextInputDetails {
+public final class TextInputDetails {
 	
 	TextInputDetails() {
 		initialized = false;

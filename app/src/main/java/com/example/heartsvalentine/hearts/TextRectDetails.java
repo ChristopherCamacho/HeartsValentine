@@ -3,7 +3,7 @@ package com.example.heartsvalentine.hearts;
 import android.graphics.Rect;
 
 
-public class TextRectDetails {
+public final class TextRectDetails {
 	TextRectDetails(Rect boundingRect) {
 		this.boundingRect = boundingRect;
 		endOfLine = false;

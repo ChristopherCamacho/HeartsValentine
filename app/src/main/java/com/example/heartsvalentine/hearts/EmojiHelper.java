@@ -2,7 +2,7 @@ package com.example.heartsvalentine.hearts;
 
 import android.graphics.Paint;
 
-public class EmojiHelper {
+public final class EmojiHelper {
     public static boolean isCharEmojiAtPos(String str, int pos) {
         char chr = str.charAt(pos);
         // chr == 0x270D is an annoying exception - it's the writing hand that can be coloured like other emojis

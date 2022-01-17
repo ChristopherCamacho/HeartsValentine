@@ -2,7 +2,7 @@ package com.example.heartsvalentine.hearts;
 
 //import Hyphens.HyphenatePatternsLanguage;
 
-public class TextFormattingDetails {
+public final class TextFormattingDetails {
 	
 	public TextFormattingDetails(String contentText, boolean optimizeSpacing, boolean hyphenateText,
 								 String hyphenPatternLan, int topTextMargin, int lineHeight, int txtHeartsMargin, int txtColor) {

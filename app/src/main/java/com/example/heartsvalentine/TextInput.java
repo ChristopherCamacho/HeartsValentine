@@ -73,7 +73,7 @@ public class TextInput extends Fragment {
         heartValParametersViewModel = new ViewModelProvider(requireActivity()).get(HeartValParametersViewModel.class);
 
         EditText editTextInput = view.findViewById(R.id.editTextInput);
-        editTextInput.setText((CharSequence) textInputViewModel.getSelectedItem().getValue());
+        editTextInput.setText(textInputViewModel.getSelectedItem().getValue());
     }
 
     void OnExitToUserFilesFragment(View view) {
@@ -108,8 +108,8 @@ public class TextInput extends Fragment {
                 //MainActivity.setHeartValBitmap(heartsValentine.GetHeartValBitmapImage());
                 // generate image file in Pictures folder:
                 if (getActivity() != null) {
-                    String fileNsame = "HV-" + String.valueOf(System.currentTimeMillis());
-                    MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), heartsValentine.GetHeartValBitmapImage(), fileNsame, "Generated through Hearts Valentine.");
+                    String fileName = "HV-" + System.currentTimeMillis();
+                    MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), heartsValentine.GetHeartValBitmapImage(), fileName, "Generated through Hearts Valentine.");
                 }
                 heartsValBitmapViewModel.selectItem(heartsValentine.GetHeartValBitmapImage());
 
