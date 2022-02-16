@@ -72,7 +72,6 @@ public class HyphenFiles extends Fragment {
         HyphenDetails[] hd = hyphenDetailsList.toArray(new HyphenDetails[0]);
         HyphenDetailsListAdapter hyphenDetailsListAdapter = new HyphenDetailsListAdapter(view.getContext(), hd, hyphenFilesList);
         hyphenFileDetailsList.setAdapter(hyphenDetailsListAdapter);
-
     }
 
     void navigateToSettingsFragment() {

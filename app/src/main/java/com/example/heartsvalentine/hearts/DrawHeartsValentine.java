@@ -7,14 +7,15 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 
 import com.example.heartsvalentine.R;
+import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
 
 // https://stackoverflow.com/questions/27588965/how-to-use-custom-font-in-a-project-written-in-android-studio
 
 public class DrawHeartsValentine {
-	public DrawHeartsValentine(TextFormattingDetails tfd, boolean useEmoji, int heartColor, int backgroundColor, int margin, Context context) {
+	public DrawHeartsValentine(TextFormattingDetails tfd, ShapeDetails sd, int backgroundColor, int margin, Context context) {
 		this.tfd = tfd;
 		mainSizes = new MainSizes(margin);
-		hd = new HeartDetails(useEmoji, heartColor);
+		this.sd = sd;
 		this.backgroundColor = backgroundColor;
 		initialize();
 		this.context = context;
@@ -52,7 +53,7 @@ public class DrawHeartsValentine {
 	private int textLenFromWidth(int width) {
 		//hd = new HeartDetails(/*canvas*/);
 		mainSizes.resetWidthHeightRadius(width);
-		dt = new DrawText(canvas, mainSizes, hd, tfd, context);
+		dt = new DrawText(canvas, mainSizes, sd, tfd, context);
 		return dt.computeTextSpaceAvailable();
 	}
   	
@@ -115,7 +116,7 @@ public class DrawHeartsValentine {
 			if (mainSizes.getWidth() == 0 || mainSizes.getHeight() == 0)
 				throw new HeartsValException(context.getResources().getString(R.string.error_no_width_or_height));
 
-			dt = new DrawText(canvas, mainSizes, hd, tfd, context);
+			dt = new DrawText(canvas, mainSizes, sd, tfd, context);
 
 			if (counter == 1) {
 				dt.resetTextInputDefails();
@@ -170,80 +171,31 @@ public class DrawHeartsValentine {
 		bitmap.recycle();
 		bitmap = Bitmap.createBitmap(mainSizes.getWidth(), mainSizes.getHeight(), Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bitmap);
-		dt = new DrawText(canvas, mainSizes, hd, tfd, context);
+		dt = new DrawText(canvas, mainSizes, sd, tfd, context);
 		dt.computeTextPlacementDetails();
 	}
 	
 	public void draw() {
-	//	try {
-			int closestDistance = hd.getUseEmoji()? 250 : 150; // cannot get an exact distance between hearts centres. This is lowest value possible for good fit.
-			// We work out this distance later, which will be a bit greater.
-			paint.setColor(backgroundColor);
-	    	canvas.drawRect(0, 0, mainSizes.getWidth(), mainSizes.getHeight(), paint );
+		int closestDistance = sd.getClosestDistance(); // cannot get an exact distance between hearts centres. This is lowest value possible for good fit.
 
-			// Draw hearts...	    
-			DrawHearts drawHearts = new DrawHearts(canvas, mainSizes, closestDistance, hd);
-			drawHearts.draw();
-			//for testing so see where bounding rectangles are...
-	//		dt.drawTextBoundingRectangles();
-			dt.draw();
-	    
-		//	canvas.dispose();
-		//	https://stackoverflow.com/questions/13533471/how-to-save-view-from-canvas-to-png-file
-			//https://www.geeksforgeeks.org/how-to-capture-screenshot-of-a-view-and-save-it-to-gallery-in-android/
-			//https://www.geeksforgeeks.org/how-to-capture-screenshot-of-a-view-and-save-it-to-gallery-in-android/
-			// Generating a file name
-/*			String filename = "${System.currentTimeMillis()}.png";
+		// We work out this distance later, which will be a bit greater.
+		paint.setColor(backgroundColor);
+		canvas.drawRect(0, 0, mainSizes.getWidth(), mainSizes.getHeight(), paint );
 
-			// Output stream
-			OutputStream fos = null;
-
-			// For devices running android >= Q
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-				// getting the contentResolver
-				this.contentResolver?.also { resolver ->
-
-						// Content resolver will process the contentvalues
-						val contentValues = ContentValues().apply {
-
-					// putting file information in content values
-					put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-					put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
-					put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-				}
-
-					// Inserting the contentValues to
-					// contentResolver and getting the Uri
-					val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-					// Opening an outputstream with the Uri that we got
-					fos = imageUri?.let { resolver.openOutputStream(it) }
-				}
-			} else {
-				// These for devices running on android < Q
-				val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-				val image = File(imagesDir, filename)
-				fos = FileOutputStream(image)
-			}
-
-			fos?.use {
-				// Finally writing the bitmap to the output stream that we opened
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-				Toast.makeText(this , "Captured View and saved to Gallery" , Toast.LENGTH_SHORT).show()
-			}
+		/* for testing emoji placement
+		if (sd instanceof EmojiShapeDetails) {
+			EmojiShapeDetails esd = (EmojiShapeDetails)sd;
+			esd.drawEmojiWithBoundaries(canvas, paint);
 		}
+		*/
 
+		// Draw hearts...
+		DrawHearts drawHearts = new DrawHearts(canvas, mainSizes, closestDistance, sd);
+		drawHearts.draw();
 
-
-			File file = new File("HeartsValentine.png");
-			ImageIO.write(bufferedImage, "png", file);
-	
-			file = new File("HeartsValentine.jpg");
-			ImageIO.write(bufferedImage, "jpg", file); */
-	/*	} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  */
+		// for testing so see where bounding rectangles are...
+		// dt.drawTextBoundingRectangles();
+		dt.draw();
 	}
 
 	public Bitmap GetHeartValBitmapImage() {
@@ -253,9 +205,8 @@ public class DrawHeartsValentine {
 	private final TextFormattingDetails tfd;
 	private Bitmap bitmap;
 	private Paint paint;
-	//private BufferedImage bufferedImage;
 	private Canvas canvas;
-	private final HeartDetails hd;
+	private final ShapeDetails sd;
 	private DrawText dt;
 	private float pixelTxtLen;
 	private final MainSizes mainSizes;

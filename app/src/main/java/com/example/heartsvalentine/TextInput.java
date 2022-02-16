@@ -101,11 +101,10 @@ public class TextInput extends Fragment {
                 String strTextInput = editTextInput.getText().toString();
                 TextFormattingDetails tfd = new TextFormattingDetails(strTextInput, hvp.getOptimizeSpacing(), hvp.getHyphenateText(),
                         hvp.getHyphenFileName(), 50, 170, hvp.getTxtHeartsMargin(), hvp.getTextColor());
-                DrawHeartsValentine heartsValentine = new DrawHeartsValentine(tfd, hvp.getUseEmoji(), hvp.getHeartsColor(), hvp.getBackgroundColor(), hvp.getOuterMargin(), getContext());
+                DrawHeartsValentine heartsValentine = new DrawHeartsValentine(tfd, hvp.getShapeDetails(), hvp.getBackgroundColor(), hvp.getOuterMargin(), getContext());
                 heartsValentine.computeTextFit(getContext());
                 heartsValentine.draw();
 
-                //MainActivity.setHeartValBitmap(heartsValentine.GetHeartValBitmapImage());
                 // generate image file in Pictures folder:
                 if (getActivity() != null) {
                     String fileName = "HV-" + System.currentTimeMillis();

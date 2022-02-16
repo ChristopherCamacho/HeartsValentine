@@ -1,5 +1,9 @@
 package com.example.heartsvalentine;
 
+import com.example.heartsvalentine.hearts.shapeDetails.DrawHeartDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+
 // This class holds all the parameters needed to create the image
 public class HeartValParameters {
     private String hyphenFileName = null;
@@ -12,6 +16,8 @@ public class HeartValParameters {
     private int heartsColor = 0xFFFF0000;
     private int backgroundColor =0xFFFFFFFF;
     private boolean useEmoji = false;
+    private String emoji = Character.toString((char) 0x2665);;
+    private ShapeType shapeType = ShapeType.StraightHeart;
 
     HeartValParameters() {
     }
@@ -87,5 +93,28 @@ public class HeartValParameters {
 
     boolean getUseEmoji() {
         return useEmoji;
+    }
+
+    void setEmoji(String emoji) {
+        this.emoji = emoji;
+    }
+
+    String getEmoji() {
+        return emoji;
+    }
+
+    void setShapeType(ShapeType shapeType) {
+        this.shapeType = shapeType;
+    }
+
+    ShapeType getShapeType() {
+        return shapeType;
+    }
+
+    ShapeDetails getShapeDetails() {
+        if (useEmoji) {
+            return new EmojiShapeDetails(emoji);
+        }
+        return new DrawHeartDetails(heartsColor, 92);
     }
 }

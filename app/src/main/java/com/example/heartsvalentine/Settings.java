@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.text.Editable;
@@ -51,7 +52,7 @@ public class Settings extends Fragment {
     HashMap<String, String> fileNameHplMap;
     HeartValParameters hvp;
     boolean neededToDownloadText = false;
-    boolean wasHyphenfileListEmpty;
+    boolean wasHyphenFileListEmpty;
     private FragmentActivity fragmentActivityContext;
 
     public Settings() {
@@ -117,9 +118,14 @@ public class Settings extends Fragment {
         hyphenateSwitch.setChecked(hvp.getHyphenateText());
         hyphenateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> hvp.setHyphenateText(isChecked));
 
+        /*
         androidx.appcompat.widget.AppCompatButton heartsColorButton = view.findViewById(R.id.heartsColorButton);
         heartsColorButton.setBackgroundColor(hvp.getHeartsColor());
         heartsColorButton.setOnClickListener(v -> onClickHeartsColorButton(v, heartsColorButton));
+        */
+
+        final View buttonNavToFrmShapeSettings = view.findViewById(R.id.frameShapeSettings);
+        buttonNavToFrmShapeSettings.setOnClickListener(v -> navigateToFrameShapeSettingsFragment());
 
         androidx.appcompat.widget.AppCompatButton backgroundColorButton = view.findViewById(R.id.backgroundColorButton);
         backgroundColorButton.setBackgroundColor(hvp.getBackgroundColor());
@@ -167,11 +173,13 @@ public class Settings extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
 
+        /*
         activateDeactivateHeartColorButton(view, !hvp.getUseEmoji());
         androidx.appcompat.widget.SwitchCompat useEmojiSwitch = view.findViewById(R.id.useEmojiSwitch);
         useEmojiSwitch.setChecked(hvp.getUseEmoji());
         useEmojiSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {hvp.setUseEmoji(isChecked);
             activateDeactivateHeartColorButton(view, !isChecked);});
+        */
 
         final View saveSettingsButton = view.findViewById(R.id.saveSettings);
         saveSettingsButton.setOnClickListener(v -> saveSettings());
@@ -179,17 +187,29 @@ public class Settings extends Fragment {
         final View deleteSettingsButton = view.findViewById(R.id.deleteSettings);
         deleteSettingsButton.setOnClickListener(v -> deleteSettings());
     }
-
-        void navigateToHyphenationFragment() {
+// https://stackoverflow.com/questions/14810348/fragment-is-not-being-replaced-but-put-on-top-of-the-previous-one
+    void navigateToHyphenationFragment() {
         Fragment fragment = new HyphenFiles();
 
         FragmentManager fragmentManager =  fragmentActivityContext.getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.settings_frame, fragment)
                 .setReorderingAllowed(true)
+                .addToBackStack(null)
                 .commit();
     }
 
+    void navigateToFrameShapeSettingsFragment() {
+        Fragment fragment = new FrameShapes();
+
+        FragmentManager fragmentManager =  fragmentActivityContext.getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.settings_frame, fragment)
+                .setReorderingAllowed(true)
+                .addToBackStack(null)
+                .commit();
+    }
+/*
     public void onClickHeartsColorButton(View v, androidx.appcompat.widget.AppCompatButton heartsColorButton) {
         if (!hvp.getUseEmoji()) {
             new ColorPickerPopup.Builder(getContext()).initialColor(hvp.getHeartsColor())
@@ -211,7 +231,7 @@ public class Settings extends Fragment {
                             });
         }
     }
-
+*/
     public void onClickBackgroundColorButton(View v, androidx.appcompat.widget.AppCompatButton backgroundColorButton) {
         new ColorPickerPopup.Builder(getContext()).initialColor(hvp.getBackgroundColor())
                 .enableBrightness(true)
@@ -263,18 +283,18 @@ public class Settings extends Fragment {
             needToDownloadText.setVisibility(View.VISIBLE);
             spinner.setVisibility(View.GONE);
             hyphenateSwitch.setVisibility(View.GONE);
-            wasHyphenfileListEmpty = true;
+            wasHyphenFileListEmpty = true;
         } else {
             needToDownloadText.setVisibility(View.GONE);
             spinner.setVisibility(View.VISIBLE);
             hyphenateSwitch.setVisibility(View.VISIBLE);
             Context context = this.getContext();
 
-            // If the hyphenfile list was empty and has just been filled, we switch hyphenation on.
-            if (wasHyphenfileListEmpty) {
+            // If the hyphenFile list was empty and has just been filled, we switch hyphenation on.
+            if (wasHyphenFileListEmpty) {
                 hyphenateSwitch.setChecked(true);
             }
-            wasHyphenfileListEmpty = false;
+            wasHyphenFileListEmpty = false;
 
             if (context != null) {
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(),
@@ -293,7 +313,7 @@ public class Settings extends Fragment {
             }
         }
     }
-
+/*
     void activateDeactivateHeartColorButton(View view, boolean activate) {
         // This methods just gives the disable look.
         TextView heartColorText = view.findViewById(R.id.heartColorText);
@@ -306,6 +326,7 @@ public class Settings extends Fragment {
         androidx.appcompat.widget.AppCompatButton heartsColorButton = view.findViewById(R.id.heartsColorButton);
         heartsColorButton.setBackgroundColor(activate? hvp.getHeartsColor() : hvp.getHeartsColor() & 0x88FFFFFF);
     }
+    */
 
     void saveSettings() {
         try {

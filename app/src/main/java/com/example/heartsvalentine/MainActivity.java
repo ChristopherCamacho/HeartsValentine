@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         final HeartsValAdapter adapter = new HeartsValAdapter(this, this, tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
+        Utilities.setTabLayout(tabLayout);
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -179,9 +180,6 @@ public class MainActivity extends AppCompatActivity {
         FileNameHplMapViewModel fileNameHplMapViewModel = new ViewModelProvider(this).get(FileNameHplMapViewModel.class);
         fileNameHplMapViewModel.selectItem(fileNameHplMap);
         fileNameHplMapViewModel.getSelectedItem().observe(this, item -> {});
-
-
-
     }
 
     private ArrayList<String> loadUserFile() {
@@ -222,6 +220,25 @@ public class MainActivity extends AppCompatActivity {
                     hvp.setHeartsColor(jsonObject.getInt("heartsColor"));
                     hvp.setBackgroundColor(jsonObject.getInt("backgroundColor"));
                     hvp.setUseEmoji(jsonObject.getBoolean("useEmoji"));
+                    // These values are new so can be legitimately missing from older versions
+                    try {
+                        String str = (String) jsonObject.get("emoji");
+
+                        if (str != null) {
+                            hvp.setEmoji(str);
+                        }
+                        // Added at same time as emoji so if emoji fails, this will too.
+                        // Similarly, if emoji passes, this will too.
+                        String shapeType = (String) jsonObject.get("shapeType");
+                       // ShapeType st = new ShapeType.valueOf(shapeTyp);
+
+                        if (shapeType != null) {
+                            hvp.setShapeType(ShapeType.valueOf(shapeType));
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -342,6 +359,8 @@ public class MainActivity extends AppCompatActivity {
         jsonObject.put("heartsColor", hvp.getHeartsColor());
         jsonObject.put("backgroundColor", hvp.getBackgroundColor());
         jsonObject.put("useEmoji", hvp.getUseEmoji());
+        jsonObject.put("emoji", hvp.getEmoji());
+        jsonObject.put("shapeType", hvp.getShapeType());
         return jsonObject;
     }
 }

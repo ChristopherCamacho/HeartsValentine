@@ -15,4 +15,7 @@
     <color name="transparent">#00FFFFFF</color>
     <color name="red">#FFFF0000</color>
     <color name="highlightBlue">#2196FF</color>
+    <color name="faintHighlightBlue">#FF78f0ff</color>
+
+    <color name="translucide">#88ffffff</color>
 </resources>

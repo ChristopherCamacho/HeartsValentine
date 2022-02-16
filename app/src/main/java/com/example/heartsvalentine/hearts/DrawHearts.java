@@ -4,16 +4,20 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Typeface;
+
+import com.example.heartsvalentine.hearts.shapeDetails.DrawShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+
 import java.util.ArrayList;
 import java.util.List;
 
 final class DrawHearts {
-	DrawHearts(Canvas canvas, MainSizes mainSizes, int closestDistance, HeartDetails hd) {
+	DrawHearts(Canvas canvas, MainSizes mainSizes, int closestDistance, ShapeDetails sd) {
 		this.canvas = canvas;
 		this.mainSizes = mainSizes;
 		this.closestDistance = closestDistance; 
-		this.hd = hd;
-		bottomAdjust = hd.getUseEmoji()? -33 : -2*hd.getHeartHeight();
+		this.sd = sd;
+		bottomAdjust = sd.getBottomAdjustment();
 	}
 	
 	private void computeSideHearts(int totalHeartCount, double distance, double startAngle, double beta, List<Point> heartsLst,
@@ -24,22 +28,22 @@ final class DrawHearts {
 
 		if (left) {
 			while (angle < beta) {
-				heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) - hd.getHeartCenterX()), (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) -  hd.getHeartCenterY())));
+				heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) - sd.getCenterX()), (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) -  sd.getCenterY())));
 				angle += gamma;
 				heartCount++;
 			}
 		}
 		else {
 			while (angle > -beta + Math.PI) {
-				heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) -  hd.getHeartCenterX()),  (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) -  hd.getHeartCenterY())));
+				heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) -  sd.getCenterX()),  (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) -  sd.getCenterY())));
 				angle -= gamma;
 				heartCount++;
 			}	
 		}
 		
-		double a = ptCircleCentre.x + mainSizes.getRadius() * Math.cos( (left)? beta : Math.PI - beta) -  hd.getHeartCenterX();
-		double b = ptCircleCentre.y - mainSizes.getRadius() * Math.sin( (left)? beta : Math.PI - beta) -  hd.getHeartCenterY();
-		double c = mainSizes.getWidth()/2.0 -  hd.getHeartCenterX();
+		double a = ptCircleCentre.x + mainSizes.getRadius() * Math.cos( (left)? beta : Math.PI - beta) -  sd.getCenterX();
+		double b = ptCircleCentre.y - mainSizes.getRadius() * Math.sin( (left)? beta : Math.PI - beta) -  sd.getCenterY();
+		double c = mainSizes.getWidth()/2.0 -  sd.getCenterX();
 		double d = mainSizes.getHeight() - mainSizes.getMargin() + bottomAdjust;//hd.getHeartCenterY();
 
 		Point ptLast = heartsLst.get(heartsLst.size() - 1);
@@ -79,12 +83,15 @@ final class DrawHearts {
 		Typeface tf = Typeface.create("TimesRoman",  Typeface.NORMAL);
 		paint.setTypeface(tf);
 		paint.setTextSize(150);
-		paint.setColor(hd.getColor());
+
+		if (sd instanceof DrawShapeDetails) {
+			paint.setColor(((DrawShapeDetails)sd).getColor());
+		}
 
 		List<Point> heartsLst = new ArrayList<>();
 				
 		// left circle
-		Point ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius() +  hd.getHeartCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() -  hd.getHeartCenterY()));
+		Point ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius() +  sd.getCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() -  sd.getCenterY()));
 
 		double startAngle = Math.acos((mainSizes.getWidth()/2.0 - ptLeftTopCircleCentre.x)/mainSizes.getRadius());
 		double vertDistBottomPt = mainSizes.getHeight() - 2 * mainSizes.getMargin() - mainSizes.getRadius(); // y-coordinate top circle centres - y coordinate of bottom of heart
@@ -120,7 +127,7 @@ final class DrawHearts {
 			Point ptLast = heartsLst.get(heartsLst.size() - 1);
 			prevError = error;
 			oldDistance = distance;
-			error = Math.sqrt(Math.pow((mainSizes.getWidth()/2.0 -  hd.getHeartCenterX()) - ptLast.x, 2) + Math.pow(mainSizes.getHeight() - mainSizes.getMargin() + bottomAdjust - ptLast.y, 2));
+			error = Math.sqrt(Math.pow((mainSizes.getWidth()/2.0 -  sd.getCenterX()) - ptLast.x, 2) + Math.pow(mainSizes.getHeight() - mainSizes.getMargin() + bottomAdjust - ptLast.y, 2));
 
 			if (error > 1 && error < prevError) {
 				distance += (mainSizes.getHeight() - mainSizes.getMargin() + bottomAdjust > ptLast.y)? error/totalHeartCount: -error/totalHeartCount;
@@ -134,19 +141,19 @@ final class DrawHearts {
 		}
 
 		// right circle
-		Point ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() -  hd.getHeartCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() -  hd.getHeartCenterY()));
+		Point ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() -  sd.getCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() - sd.getCenterY()));
 		
 		computeSideHearts(totalHeartCount, distance, startAngle, beta, heartsLst, ptRightTopCircleCentre, false); 
 	
 		for (Point pt2d : heartsLst) {
 			//canvas.drawText(hd.getHeart(), pt2d.x, pt2d.y, paint);
-			hd.draw(canvas, (float)pt2d.x, (float)pt2d.y, paint);
+			sd.draw(canvas, (float)pt2d.x, (float)pt2d.y, paint);
 		}
 	}
 
 	MainSizes mainSizes;
 	private final int closestDistance;  
 	private final Canvas canvas;
-	HeartDetails hd;
+	ShapeDetails sd;
 	private final float bottomAdjust;
 }

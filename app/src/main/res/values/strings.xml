@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">HeartsValentine</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="text_input">Text input</string>
     <string name="settings">Settings</string>
     <string name="image">Image</string>
@@ -18,11 +16,11 @@
     <string name="hyphenate_switch">Hyphenate</string>
     <string name="optimize_spacing_switch">Optimize spacing</string>
     <string name="txt_to_heart_dist">Heart to text distance</string>
-    <string name="enter_number_between_0_50">Number between 0-50</string>
+    <string name="enter_number_between_0_50">Number between 0&#8211;50</string>
     <string name="margin">Margin</string>
-    <string name="enter_number_between_0_500">Number between 0-500</string>
+    <string name="enter_number_between_0_500">Number between 0&#8211;500</string>
     <string name="use_emoji">Use emoji</string>
-    <string name="hearts_color">Hearts color</string>
+    <string name="shape_color">Shape color</string>
     <string name="background_color">Background color</string>
     <string name="text_color">Text color</string>
     <string name="choose">Choose</string>
@@ -36,10 +34,14 @@
     <string name="error_no_width_or_height">Either width or height or both are zero.</string>
     <string name="error_unexpected">An unexpected error occurred.</string>
     <string name="enter_file_name">Please enter a file name</string>
-    <string name="save_as_file">Save as file...</string>
+    <string name="save_as_file">Save as file&#8230;</string>
     <string name="save_file">Save file</string>
     <string name="saved_files">Saved files</string>
     <string name="enter_filename">(Enter file name)</string>
     <string name="load">Load</string>
     <string name="image_description">Hearts Valentine Image</string>
+    <string name="frame_shape_settings">Frame shape settings &#62;</string>
+    <string name="emoji">Emoji</string>
+    <string name="edge_shape">Edge shape</string>
+
 </resources>

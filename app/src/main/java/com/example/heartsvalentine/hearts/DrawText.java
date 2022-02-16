@@ -19,14 +19,16 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
+import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
 import com.example.heartsvalentine.hyphens.Hyphenator;
 
 final class DrawText {
 	
-	DrawText(Canvas g2d, MainSizes mainSizes, HeartDetails hd, TextFormattingDetails tfd, Context context) {
+	DrawText(Canvas g2d, MainSizes mainSizes, ShapeDetails sd, TextFormattingDetails tfd, Context context) {
 		this.g2d = g2d;
 		this.mainSizes = mainSizes;
-		this.hd = hd;
+		this.sd = sd;
 		this.tfd = tfd;
 
 		if (tfd.gethyphenPatternLan() != null) {
@@ -62,11 +64,11 @@ final class DrawText {
 		//  (margin - heartCenterY + radius) + (radius + heartCenterY)*sin(angle) where angle = 0 to 2*pi. 
 		// these are not circles but ovals!
 		// adjustedHeartCenter is an arbitrary quickfix that gives better results for emoji
-		float adjustedHeartCenter = hd.getHeartCenterX() - 10;
-		double angle = Math.asin((y - (mainSizes.getMargin() - hd.getHeartCenterY() + mainSizes.getRadius()))/(mainSizes.getRadius() - tfd.getTxtHeartsMargin() + hd.getHeartCenterY()));
+		float adjustedHeartCenter = sd.getCenterX() - 10;
+		double angle = Math.asin((y - (mainSizes.getMargin() - sd.getCenterY() + mainSizes.getRadius()))/(mainSizes.getRadius() - tfd.getTxtHeartsMargin() + sd.getCenterY()));
 		double xCentre = left? (mainSizes.getMargin() + adjustedHeartCenter /*hd.getHeartCenterX()*/ + mainSizes.getRadius()) : (mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() - adjustedHeartCenter /*hd.getHeartCenterX()*/);
-		int xFirst = (int)(xCentre + (mainSizes.getRadius() - tfd.getTxtHeartsMargin() - hd.getHeartCenterX())*Math.cos(angle));
-		int xSecond = (int)(xCentre + (mainSizes.getRadius() - tfd.getTxtHeartsMargin() - hd.getHeartCenterX())*Math.cos(angle + Math.PI));
+		int xFirst = (int)(xCentre + (mainSizes.getRadius() - tfd.getTxtHeartsMargin() - sd.getCenterX())*Math.cos(angle));
+		int xSecond = (int)(xCentre + (mainSizes.getRadius() - tfd.getTxtHeartsMargin() - sd.getCenterX())*Math.cos(angle + Math.PI));
 		int[] retVal = new int[2];
 		retVal[0] = Math.min(xFirst, xSecond);
 		retVal[1] = Math.max(xFirst, xSecond);
@@ -80,10 +82,10 @@ final class DrawText {
 		// 					   y_centre = margin - 2*heartCenterY + (radius + heartCenterY) = margin - heartCenterY + radius
 		// equation of an ellipse is (x - Cx)**2/a**2 + (y - Cy)**2/b**2 = 1
 		// so x = Cx +- a*sqrt(1 - (y - Cy)**2/b**2)
-		double Cx = left? (mainSizes.getMargin() + mainSizes.getRadius() +  hd.getHeartCenterX()) : (mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() -  hd.getHeartCenterX());
-		double Cy = (mainSizes.getMargin() + mainSizes.getRadius() +  hd.getHeartCenterY());
-		double a = mainSizes.getRadius() - hd.getHeartCenterX() - tfd.getTxtHeartsMargin();
-		double b = mainSizes.getRadius() - hd.getHeartCenterY() - tfd.getTxtHeartsMargin();
+		double Cx = left? (mainSizes.getMargin() + mainSizes.getRadius() +  sd.getCenterX()) : (mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() -  sd.getCenterX());
+		double Cy = (mainSizes.getMargin() + mainSizes.getRadius() +  sd.getCenterY());
+		double a = mainSizes.getRadius() - sd.getCenterX() - tfd.getTxtHeartsMargin();
+		double b = mainSizes.getRadius() - sd.getCenterY() - tfd.getTxtHeartsMargin();
 
 		int[] retVal = new int[2];
 		retVal[0] = (int)(Cx - a*Math.sqrt(1 - Math.pow(y - Cy, 2)/(b*b)));
@@ -92,8 +94,8 @@ final class DrawText {
 	}
 
 	private int[][] computeBottomTrianglePts() {
-		Point ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius() + hd.getHeartCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() - hd.getHeartCenterY()));
-		Point ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() - hd.getHeartCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() - hd.getHeartCenterY()));
+		Point ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius() + sd.getCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() - sd.getCenterY()));
+		Point ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() - sd.getCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() - sd.getCenterY()));
 
 		double startAngle = Math.acos((mainSizes.getWidth()/2.0 - ptLeftTopCircleCentre.x)/mainSizes.getRadius());
 		double vertDistBottomPt = mainSizes.getHeight() - 2 * mainSizes.getMargin() - mainSizes.getRadius(); // y-coord top circle centres - y coord of bottom of heart
@@ -103,14 +105,15 @@ final class DrawText {
 		double beta = 2*Math.PI - alpha - phi;
 
 		double pt1x = ptLeftTopCircleCentre.x + mainSizes.getRadius() * Math.cos(beta)  - tfd.getTxtHeartsMargin() / Math.sin(beta)/*- heartCenterX + heartCenterWidth*/;
-		double pt1y = ptLeftTopCircleCentre.y - mainSizes.getRadius() * Math.sin(beta) - hd.getHeartCenterY() /* + heightAdjustment*/;
+		double pt1y = ptLeftTopCircleCentre.y - mainSizes.getRadius() * Math.sin(beta) - sd.getCenterY() /* + heightAdjustment*/;
 
 		double pt2x = ptRightTopCircleCentre.x + mainSizes.getRadius() * Math.cos(Math.PI - beta) + tfd.getTxtHeartsMargin() / Math.sin(beta)/*- heartCenterX + heartCenterWidth*/;
-		double pt2y = ptRightTopCircleCentre.y - mainSizes.getRadius() * Math.sin(Math.PI - beta) - hd.getHeartCenterY() /*+ heightAdjustment*/;
+		double pt2y = ptRightTopCircleCentre.y - mainSizes.getRadius() * Math.sin(Math.PI - beta) - sd.getCenterY() /*+ heightAdjustment*/;
 
-		if (!hd.getUseEmoji()) {
-			pt1y += 2.0f * hd.getHeartHeight();
-			pt2y += 2.0f * hd.getHeartHeight();
+		if (!(sd instanceof EmojiShapeDetails)) {
+	//	if (!hd.getUseEmoji()) {
+			pt1y += 2.0f * sd.getHeight();
+			pt2y += 2.0f * sd.getHeight();
 			// I've already added for pt3.y elsewhere - tidy when have time. This works safely, but messy.
 		}
 		
@@ -118,7 +121,7 @@ final class DrawText {
 		double pt3y = mainSizes.getHeight() - mainSizes.getMargin() + tfd.getTxtHeartsMargin() / Math.cos(Math.PI/2.0 - beta);
 		
 		double zeta = Math.atan ( (pt1y - pt3y)/(pt1x - pt3x));
-		double heightAdjustment = -0.5 * hd.getHeartWidth() * Math.sin(zeta) - hd.getHeartHeight();
+		double heightAdjustment = -0.5 * sd.getWidth() * Math.sin(zeta) - sd.getHeight();
 
 		pt1y += heightAdjustment;
 		pt2y += heightAdjustment;
@@ -136,17 +139,17 @@ final class DrawText {
 	void drawShapes(int[][] pts) {
 		// top left oval
 		paint.setColor(Color.BLUE);
-		g2d.drawArc((mainSizes.getMargin()  + hd.getHeartWidth() + tfd.getTxtHeartsMargin()),
-				 (mainSizes.getMargin() + hd.getHeartHeight() + tfd.getTxtHeartsMargin()),
+		g2d.drawArc((mainSizes.getMargin()  + sd.getWidth() + tfd.getTxtHeartsMargin()),
+				 (mainSizes.getMargin() + sd.getHeight() + tfd.getTxtHeartsMargin()),
 				(2*mainSizes.getRadius() /*- hd.getHeartCenterX()*/ - tfd.getTxtHeartsMargin()),
-				(2*(mainSizes.getRadius() + hd.getHeartCenterY() - tfd.getTxtHeartsMargin())),
+				(2*(mainSizes.getRadius() + sd.getCenterY() - tfd.getTxtHeartsMargin())),
 				0, 360, true, paint);
 		// Top right oval
 		paint.setColor(Color.CYAN);
 		g2d.drawArc((mainSizes.getWidth() - mainSizes.getMargin() - 2*mainSizes.getRadius()  + tfd.getTxtHeartsMargin()),
-				 (mainSizes.getMargin() + hd.getHeartHeight() + tfd.getTxtHeartsMargin()),
-				(mainSizes.getWidth()  - hd.getHeartWidth() - tfd.getTxtHeartsMargin()),
-				(2*(mainSizes.getRadius() - tfd.getTxtHeartsMargin() + hd.getHeartCenterY())),
+				 (mainSizes.getMargin() + sd.getHeight() + tfd.getTxtHeartsMargin()),
+				(mainSizes.getWidth()  - sd.getWidth() - tfd.getTxtHeartsMargin()),
+				(2*(mainSizes.getRadius() - tfd.getTxtHeartsMargin() + sd.getCenterY())),
                                               	    0, 360, true, paint);
 
 		Path path = new Path();
@@ -184,9 +187,10 @@ final class DrawText {
 		// Uncomment line below for testing purposes
         // drawShapes(pts);
 			
-		int yTop = (int)(tfd.getTopTextMargin() + mainSizes.getMargin() + 2*hd.getHeartHeight());
+		int yTop = (int)(tfd.getTopTextMargin() + mainSizes.getMargin() + 2*sd.getHeight());
 
-		if (hd.getUseEmoji()) {
+		if (sd instanceof EmojiShapeDetails) {
+		// if (hd.getUseEmoji()) {
 			while (yTop < pts[1][0]) {
 				int[] xTopLeft = getXCircleIntersectionsFromY(yTop, true);
 				int[] xTopRight = getXCircleIntersectionsFromY(yTop, false);
@@ -205,9 +209,9 @@ final class DrawText {
 				// see INPUT_PATH_SILLY_MESSAGE with text to heart margin of 20
 				// To remedy this, let us also merge if gap is very small - say half of heart width.
 				// Hope not introducing bug here.
-				int maxGap = (int) (hd.getHeartWidth() / 2.0);
+				int maxGap = (int) (sd.getWidth() / 2.0);
 
-				if (xRightLeftCircle + maxGap < xLeftRightCircle && yTop < (mainSizes.getMargin() - hd.getHeartCenterY() + mainSizes.getRadius()) && yBottom < (mainSizes.getMargin() - hd.getHeartCenterY() + mainSizes.getRadius())) {
+				if (xRightLeftCircle + maxGap < xLeftRightCircle && yTop < (mainSizes.getMargin() - sd.getCenterY() + mainSizes.getRadius()) && yBottom < (mainSizes.getMargin() - sd.getCenterY() + mainSizes.getRadius())) {
 					rectLst.add(new TextRectDetails(new Rect(xLeftLeftCircle, yTop, xRightLeftCircle, yBottom)));
 					rectLst.add(new TextRectDetails(new Rect(xLeftRightCircle, yTop, xRightRightCircle, yBottom)));
 				} else {
@@ -236,9 +240,9 @@ final class DrawText {
 				// see INPUT_PATH_SILLY_MESSAGE with text to heart margin of 20
 				// To remedy this, let us also merge if gap is very small - say half of heart width.
 				// Hope not introducing bug here.
-				int maxGap = (int) (hd.getHeartWidth() / 2.0);
+				int maxGap = (int) (sd.getWidth() / 2.0);
 
-				if (xRightLeftCircle + maxGap < xLeftRightCircle && yTop < (mainSizes.getMargin() - hd.getHeartCenterY() + mainSizes.getRadius()) && yBottom < (mainSizes.getMargin() - hd.getHeartCenterY() + mainSizes.getRadius())) {
+				if (xRightLeftCircle + maxGap < xLeftRightCircle && yTop < (mainSizes.getMargin() - sd.getCenterY() + mainSizes.getRadius()) && yBottom < (mainSizes.getMargin() - sd.getCenterY() + mainSizes.getRadius())) {
 					rectLst.add(new TextRectDetails(new Rect(xLeftLeftCircle, yTop, xRightLeftCircle, yBottom)));
 					rectLst.add(new TextRectDetails(new Rect(xLeftRightCircle, yTop, xRightRightCircle, yBottom)));
 				} else {
@@ -893,7 +897,8 @@ final class DrawText {
 	private final Canvas g2d;
 	private final Paint paint;
 	private final MainSizes mainSizes;
-	private final HeartDetails hd;
+	//private final HeartDetails hd;
+	private final ShapeDetails sd;
 	private final TextFormattingDetails tfd;
 	private final float textAscent;
 	//private final float textDescent;
