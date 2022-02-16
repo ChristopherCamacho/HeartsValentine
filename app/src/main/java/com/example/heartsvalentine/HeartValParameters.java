@@ -1,6 +1,9 @@
 package com.example.heartsvalentine;
 
+import com.example.heartsvalentine.hearts.shapeDetails.DrawCircleDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawHeartDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawSquareDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawStarDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
 
@@ -115,6 +118,18 @@ public class HeartValParameters {
         if (useEmoji) {
             return new EmojiShapeDetails(emoji);
         }
-        return new DrawHeartDetails(heartsColor, 92);
+
+        switch (shapeType) {
+            case StraightHeart:
+                return new DrawHeartDetails(heartsColor, 92);
+            case Circle:
+                return new DrawCircleDetails(heartsColor, 92);
+            case Square:
+                return new DrawSquareDetails(heartsColor, 92);
+            case Star:
+                return new DrawStarDetails(heartsColor, 92);
+        }
+
+        return null;
     }
 }
