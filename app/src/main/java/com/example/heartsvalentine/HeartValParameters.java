@@ -19,7 +19,7 @@ public class HeartValParameters {
     private int heartsColor = 0xFFFF0000;
     private int backgroundColor =0xFFFFFFFF;
     private boolean useEmoji = false;
-    private String emoji = Character.toString((char) 0x2665);;
+    private String emoji = Character.toString((char) 0x2665);
     private ShapeType shapeType = ShapeType.StraightHeart;
 
     HeartValParameters() {

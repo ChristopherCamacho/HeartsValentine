@@ -32,7 +32,7 @@ public class DrawHeartsValentine {
 	// We can only have this by creating an unused graphic object.
 	private void initializeGraphics() {
 		bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-	    canvas = new Canvas(bitmap);//  bufferedImage.createGraphics();
+	    canvas = new Canvas(bitmap);
 	}
 	
 	private void setStandardTextFont() {

@@ -3,15 +3,10 @@ package com.example.heartsvalentine.hearts.shapeDetails;
 import android.graphics.PointF;
 import java.util.ArrayList;
 
-
-
-
-
-
 public class StarDetailsGlobalObject {
 
     private final float centerX, centerY;
-    private static final ArrayList<PointF> starPtsList = new ArrayList<>();
+    private final ArrayList<PointF> starPtsList = new ArrayList<>();
 
     StarDetailsGlobalObject(StarSearchDetails searchDetails) {
         centerX = 0.5f * searchDetails.getWidthHeight();
@@ -25,8 +20,6 @@ public class StarDetailsGlobalObject {
 
         double forwardAngleMove = Math.PI/searchDetails.getSpikes();
         double currentAngle = searchDetails.getStartAngle();
-
-        starPtsList.clear();
 
         while (currentAngle < searchDetails.getStartAngle() + 2 * Math.PI) {
             currentAngle += forwardAngleMove;
@@ -47,5 +40,4 @@ public class StarDetailsGlobalObject {
     public float getCenterY() {
         return centerY;
     }
-
 }
