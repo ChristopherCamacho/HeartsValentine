@@ -7,18 +7,36 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 
 import com.example.heartsvalentine.R;
+import com.example.heartsvalentine.ShapeType;
+import com.example.heartsvalentine.hearts.mainShapes.MainShape;
+import com.example.heartsvalentine.hearts.mainSizes.MainSizes;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
 
 // https://stackoverflow.com/questions/27588965/how-to-use-custom-font-in-a-project-written-in-android-studio
 
 public class DrawHeartsValentine {
-	public DrawHeartsValentine(TextFormattingDetails tfd, ShapeDetails sd, int backgroundColor, int margin, Context context) {
+	private final TextFormattingDetails tfd;
+	private Bitmap bitmap;
+	private Paint paint;
+	private Canvas canvas;
+	private final ShapeDetails sd;
+	private DrawText dt;
+	private float pixelTxtLen;
+	private final MainSizes mainSizes;
+	private static final int maxIterations = 300;
+	private static final int stepIncrement = 4;
+	private final int backgroundColor;
+	private Context context;
+	private final ShapeType mainShapeType;
+
+	public DrawHeartsValentine(TextFormattingDetails tfd, ShapeType mainShapeType, ShapeDetails sd, int backgroundColor, int margin, Context context) {
 		this.tfd = tfd;
-		mainSizes = new MainSizes(margin);
+		mainSizes = ObjectFromShapeType.getMainSizeFromShapeType(mainShapeType, margin);
 		this.sd = sd;
 		this.backgroundColor = backgroundColor;
 		initialize();
 		this.context = context;
+		this.mainShapeType = mainShapeType;
 	}
 	
 	private void initialize() {
@@ -52,8 +70,8 @@ public class DrawHeartsValentine {
 	// part of experiment - used for computing gross estimate
 	private int textLenFromWidth(int width) {
 		//hd = new HeartDetails(/*canvas*/);
-		mainSizes.resetWidthHeightRadius(width);
-		dt = new DrawText(canvas, mainSizes, sd, tfd, context);
+		mainSizes.resetSizes(width);
+		dt = new DrawText(canvas, mainSizes, sd, tfd, mainShapeType, context);
 		return dt.computeTextSpaceAvailable();
 	}
   	
@@ -91,7 +109,7 @@ public class DrawHeartsValentine {
   	}
 	
 	public void computeTextFit(Context context) throws HeartsValException {
-		mainSizes.resetWidthHeightRadius(getWidthEstimateFromTextLen(pixelTxtLen));
+		mainSizes.resetSizes(getWidthEstimateFromTextLen(pixelTxtLen));
 		this.context = context;
 
 		if (tfd.getContentText().length() == 0) {
@@ -116,10 +134,10 @@ public class DrawHeartsValentine {
 			if (mainSizes.getWidth() == 0 || mainSizes.getHeight() == 0)
 				throw new HeartsValException(context.getResources().getString(R.string.error_no_width_or_height));
 
-			dt = new DrawText(canvas, mainSizes, sd, tfd, context);
+			dt = new DrawText(canvas, mainSizes, sd, tfd, mainShapeType, context);
 
 			if (counter == 1) {
-				dt.resetTextInputDefails();
+				dt.resetTextInputDetails();
 			}
 			dt.computeTextPlacementDetails();
 			
@@ -138,12 +156,12 @@ public class DrawHeartsValentine {
 							goodSize = true;
 						}
 						else {
-							mainSizes.resetWidthHeightRadius(mainSizes.getWidth() - 1);
+							mainSizes.resetSizes(mainSizes.getWidth() - 1);
 							smallDecrease = true;
 						}				
 					}
 					else {
-						mainSizes.resetWidthHeightRadius(mainSizes.getWidth() - 5);
+						mainSizes.resetSizes(mainSizes.getWidth() - 5);
 					}	
 					decreased = true;
 				}				
@@ -151,7 +169,7 @@ public class DrawHeartsValentine {
 			else {
 				// Frame is too small. We need to increase it and try again...
 				if (decreased) {
-					mainSizes.resetWidthHeightRadius(mainSizes.getWidth() + 1);
+					mainSizes.resetSizes(mainSizes.getWidth() + 1);
 					smallIncrease = true;
 					
 					if (smallDecrease) {
@@ -161,7 +179,7 @@ public class DrawHeartsValentine {
 					}
 				}
 				else {
-					mainSizes.resetWidthHeightRadius(mainSizes.getWidth() + 5);
+					mainSizes.resetSizes(mainSizes.getWidth() + 5);
 				}
 				increased = true;
 			}
@@ -171,7 +189,7 @@ public class DrawHeartsValentine {
 		bitmap.recycle();
 		bitmap = Bitmap.createBitmap(mainSizes.getWidth(), mainSizes.getHeight(), Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bitmap);
-		dt = new DrawText(canvas, mainSizes, sd, tfd, context);
+		dt = new DrawText(canvas, mainSizes, sd, tfd, mainShapeType, context);
 		dt.computeTextPlacementDetails();
 	}
 	
@@ -190,8 +208,11 @@ public class DrawHeartsValentine {
 		*/
 
 		// Draw hearts...
-		DrawHearts drawHearts = new DrawHearts(canvas, mainSizes, closestDistance, sd);
-		drawHearts.draw();
+		MainShape ms = ObjectFromShapeType.getMainShape(mainShapeType, canvas, mainSizes, closestDistance, sd);
+
+		if (ms != null) {
+			ms.draw();
+		}
 
 		// for testing so see where bounding rectangles are...
 		// dt.drawTextBoundingRectangles();
@@ -201,17 +222,4 @@ public class DrawHeartsValentine {
 	public Bitmap GetHeartValBitmapImage() {
 		return bitmap;
 	}
-		
-	private final TextFormattingDetails tfd;
-	private Bitmap bitmap;
-	private Paint paint;
-	private Canvas canvas;
-	private final ShapeDetails sd;
-	private DrawText dt;
-	private float pixelTxtLen;
-	private final MainSizes mainSizes;
-	private static final int maxIterations = 300;
-	private static final int stepIncrement = 4;
-	private final int backgroundColor;
-	private Context context;
 }

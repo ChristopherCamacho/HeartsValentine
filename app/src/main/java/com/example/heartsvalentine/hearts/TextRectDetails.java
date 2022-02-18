@@ -4,7 +4,7 @@ import android.graphics.Rect;
 
 
 public final class TextRectDetails {
-	TextRectDetails(Rect boundingRect) {
+	public TextRectDetails(Rect boundingRect) {
 		this.boundingRect = boundingRect;
 		endOfLine = false;
 	}	
@@ -17,7 +17,7 @@ public final class TextRectDetails {
 	void setEndOfLine() {
 		this.endOfLine = true;
 	}
-	Rect getBoundingRect(){
+	public Rect getBoundingRect(){
 		return boundingRect;
 	}
 	String getText() {

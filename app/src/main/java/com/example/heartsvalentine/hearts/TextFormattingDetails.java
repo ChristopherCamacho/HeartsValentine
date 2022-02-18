@@ -38,15 +38,15 @@ public final class TextFormattingDetails {
 		return hyphenPatternLan;
 	}
 
-	int getTopTextMargin() {
+	public int getTopTextMargin() {
 		return topTextMargin;
 	}
 
-	int getLineHeight() {
+	public int getLineHeight() {
 		return lineHeight;
 	}
 
-	int getTxtHeartsMargin() {
+	public int getTxtHeartsMargin() {
 		return txtHeartsMargin_;
 	}
 
