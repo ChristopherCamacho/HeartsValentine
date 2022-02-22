@@ -13,14 +13,14 @@ import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HeartTextBoundary implements TextBoundaries {
+public class HeartTextBoundaries implements TextBoundaries {
     private final TextFormattingDetails tfd;
     private final List<TextRectDetails> rectLst = new ArrayList<>();
     private final HeartMainSizes mainSizes;
     ShapeDetails sd;
     private final float textAscent;
 
-    public HeartTextBoundary(Paint paint, HeartMainSizes mainSizes, ShapeDetails sd, TextFormattingDetails tfd) {
+    public HeartTextBoundaries(Paint paint, HeartMainSizes mainSizes, ShapeDetails sd, TextFormattingDetails tfd) {
         this.mainSizes = mainSizes;
         this.sd = sd;
         this.tfd = tfd;
