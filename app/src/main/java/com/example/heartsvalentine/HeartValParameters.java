@@ -21,6 +21,7 @@ public class HeartValParameters {
     private boolean useEmoji = false;
     private String emoji = Character.toString((char) 0x2665);
     private ShapeType shapeType = ShapeType.StraightHeart;
+    private ShapeType mainShape = ShapeType.StraightHeart;
 
     HeartValParameters() {
     }
@@ -131,5 +132,13 @@ public class HeartValParameters {
         }
 
         return null;
+    }
+
+    void setMainShape(ShapeType shapeType) {
+        this.mainShape = shapeType;
+    }
+
+    ShapeType getMainShape() {
+        return mainShape;
     }
 }

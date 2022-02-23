@@ -165,7 +165,8 @@ public class ShapeCellCtrl extends View {
             }
             else {
                 paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(borderWidth);
+                int shapeWidth = (int) Utilities.convertDpToPixel(3, this.getContext());
+                paint.setStrokeWidth(shapeWidth);
             }
 
             float shapeHeight;
@@ -181,6 +182,17 @@ public class ShapeCellCtrl extends View {
             }
 
             drawShapeDetails.draw(canvas, innerShapeBorder, shapeHeight, paint);
+
+            if (!fillShape) {
+                paint.setColor(getResources().getColor(R.color.highlightBlue));
+                int writingWidth = (int) Utilities.convertDpToPixel(1, this.getContext());
+                paint.setStrokeWidth(writingWidth);
+                drawShapeDetails.drawWriting(canvas, innerShapeBorder, shapeHeight, paint);
+                paint.setColor(drawShapeDetails.getColor());
+                int shapeWidth = (int) Utilities.convertDpToPixel(3, this.getContext());
+                paint.setStrokeWidth(shapeWidth);
+                drawShapeDetails.draw(canvas, innerShapeBorder, shapeHeight, paint);
+            }
         }
     }
 

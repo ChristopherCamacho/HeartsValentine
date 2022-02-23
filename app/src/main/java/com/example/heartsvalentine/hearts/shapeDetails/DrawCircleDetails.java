@@ -2,6 +2,7 @@ package com.example.heartsvalentine.hearts.shapeDetails;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 
 public class DrawCircleDetails implements DrawShapeDetails {
 
@@ -28,6 +29,40 @@ public class DrawCircleDetails implements DrawShapeDetails {
     public void draw(Canvas canvas, float x, float y, Paint paint) {
         y += height;
         canvas.drawArc(x, y, x + width, y + height, 0, 360, true, paint);
+    }
+
+    @Override
+    public void drawWriting(Canvas canvas, float x, float y, Paint paint) {
+        Path line = new Path();
+        line.moveTo(x, 0);
+        line.lineTo(x + width, 0);
+        int vLineShift = 3;
+
+        line.moveTo(x, height/6f + vLineShift);
+        line.lineTo(x + width, height/6f + vLineShift);
+
+        line.moveTo(x, 2*height/6f + vLineShift);
+        line.lineTo(x + width, 2*height/6f + vLineShift);
+
+        line.moveTo(x, 3*height/6f + vLineShift);
+        line.lineTo(x + width, 3*height/6f + vLineShift);
+
+        line.moveTo(x, 4*height/6f + vLineShift);
+        line.lineTo(x + width, 4*height/6f + vLineShift);
+
+        line.moveTo(x, 5*height/6f + vLineShift);
+        line.lineTo(x + width, 5*height/6f + vLineShift);
+
+        line.moveTo(x, 6*height/6f + vLineShift);
+        line.lineTo(x + width, 6*height/6f + vLineShift);
+
+        canvas.save();
+        Path path = new Path();
+        y += height;
+        path.addArc(x, y, x + width, y + height, 0, 360);
+        canvas.clipPath(path);
+        canvas.drawPath(line, paint);
+        canvas.restore();
     }
 
     @Override

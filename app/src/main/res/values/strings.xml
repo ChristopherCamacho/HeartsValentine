@@ -43,5 +43,5 @@
     <string name="frame_shape_settings">Frame shape settings &#62;</string>
     <string name="emoji">Emoji</string>
     <string name="edge_shape">Edge shape</string>
-
+    <string name="main_shape">Main shape</string>
 </resources>

@@ -49,6 +49,10 @@ public class DrawStarDetails implements DrawShapeDetails {
     }
 
     @Override
+    public void drawWriting(Canvas canvas, float x, float y, Paint paint) {
+    }
+
+    @Override
     public float getCenterX() {
         return starSearchGloObj.getCenterX();
     }

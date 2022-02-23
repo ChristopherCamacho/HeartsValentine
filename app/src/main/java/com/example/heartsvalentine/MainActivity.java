@@ -223,19 +223,15 @@ public class MainActivity extends AppCompatActivity {
                     // These values are new so can be legitimately missing from older versions
                     try {
                         String str = (String) jsonObject.get("emoji");
+                        hvp.setEmoji(str);
 
-                        if (str != null) {
-                            hvp.setEmoji(str);
-                        }
                         // Added at same time as emoji so if emoji fails, this will too.
                         // Similarly, if emoji passes, this will too.
                         String shapeType = (String) jsonObject.get("shapeType");
-                       // ShapeType st = new ShapeType.valueOf(shapeTyp);
+                        hvp.setShapeType(ShapeType.valueOf(shapeType));
 
-                        if (shapeType != null) {
-                            hvp.setShapeType(ShapeType.valueOf(shapeType));
-                        }
-
+                        String mainShape = (String) jsonObject.get("mainShape");
+                        hvp.setMainShape(ShapeType.valueOf(mainShape));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -361,6 +357,7 @@ public class MainActivity extends AppCompatActivity {
         jsonObject.put("useEmoji", hvp.getUseEmoji());
         jsonObject.put("emoji", hvp.getEmoji());
         jsonObject.put("shapeType", hvp.getShapeType());
+        jsonObject.put("mainShape", hvp.getMainShape());
         return jsonObject;
     }
 }

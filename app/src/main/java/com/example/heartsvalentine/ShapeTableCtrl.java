@@ -21,6 +21,7 @@ public class ShapeTableCtrl extends View implements View.OnClickListener{
     private final Paint paint = new Paint(/*Paint.ANTI_ALIAS_FLAG*/);
     private RectF boundingRect;
     private final ArrayList<ShapeCellCtrl> shapeCellCtrlList = new ArrayList<>();
+    private boolean fillShape = true;
 
     public ShapeTableCtrl(Context context) {
         super(context);
@@ -41,16 +42,21 @@ public class ShapeTableCtrl extends View implements View.OnClickListener{
     }
 
     public ShapeTableCtrl(Context context, ShapeType[] shapeTypes) {
+        this(context, shapeTypes, true);
+    }
+
+    public ShapeTableCtrl(Context context, ShapeType[] shapeTypes, boolean fillShape) {
         super(context);
         columns = (int)Math.floor(Math.sqrt(shapeTypes.length));
         lastColumn = columns - 1;
+        this.fillShape = fillShape;
         init(context, shapeTypes);
     }
 
     private void init(Context context, ShapeType[] shapeTypes) {
 
         for (ShapeType shapeType : shapeTypes) {
-            ShapeCellCtrl scc = new ShapeCellCtrl(context, shapeType, true, false);
+            ShapeCellCtrl scc = new ShapeCellCtrl(context, shapeType, fillShape, false);
             shapeCellCtrlList.add(scc);
         }
 

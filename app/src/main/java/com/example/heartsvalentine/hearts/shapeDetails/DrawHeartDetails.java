@@ -16,6 +16,7 @@ public class DrawHeartDetails implements DrawShapeDetails {
     static private boolean alphaBetaComputed = false;
     static private float alpha;
     static private float beta;
+    private final Path path = new Path();
 
     public DrawHeartDetails(int heartColor, int heartWidth) {
         this.heartColor = heartColor;
@@ -87,12 +88,42 @@ public class DrawHeartDetails implements DrawShapeDetails {
         float startEndPtY = y + radius - (float)Math.sqrt(Math.pow(radius, 2) - Math.pow(width/2.0 - radius, 2));
         path.moveTo(startEndPtX, startEndPtY);
         */
-        Path path = new Path();
+        path.reset();
         //	paint.setColor(Color.RED);
         path.arcTo(leftRect, -alpha, -beta + alpha);
         path.lineTo(x + 0.5f * heartWidth, y + heartHeight);
         path.arcTo(rightRect, beta + 180, -beta + alpha);
         canvas.drawPath(path, paint);
+    }
+
+    @Override
+    public void drawWriting(Canvas canvas, float x, float y, Paint paint) {
+        Path line = new Path();
+        line.moveTo(x, 0);
+        line.lineTo(x + heartWidth, 0);
+
+        line.moveTo(x, heartHeight/6f);
+        line.lineTo(x + heartWidth, heartHeight/6f);
+
+        line.moveTo(x, 2*heartHeight/6f);
+        line.lineTo(x + heartWidth, 2*heartHeight/6f);
+
+        line.moveTo(x, 3*heartHeight/6f);
+        line.lineTo(x + heartWidth, 3*heartHeight/6f);
+
+        line.moveTo(x, 4*heartHeight/6f);
+        line.lineTo(x + heartWidth, 4*heartHeight/6f);
+
+        line.moveTo(x, 5*heartHeight/6f);
+        line.lineTo(x + heartWidth, 5*heartHeight/6f);
+
+        line.moveTo(x, 6*heartHeight/6f);
+        line.lineTo(x + heartWidth, 6*heartHeight/6f);
+
+        canvas.save();
+        canvas.clipPath(path);
+        canvas.drawPath(line, paint);
+        canvas.restore();
     }
 
     @Override
