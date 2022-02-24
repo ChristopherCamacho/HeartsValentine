@@ -34,8 +34,8 @@ public class CircleMainShape implements MainShape {
             paint.setColor(((DrawShapeDetails) sd).getColor());
         }
         else if (sd instanceof EmojiShapeDetails) {
-            horizontalAdjustment = -11;
-            verticalAdjustment = 0;
+            horizontalAdjustment = ((EmojiShapeDetails) sd).getHorizontalAdjustment() - 3;
+            verticalAdjustment = ((EmojiShapeDetails) sd).getVerticalAdjustment();
         }
 
         float ptCentreX = mainSizes.getWidth()/2.0f;

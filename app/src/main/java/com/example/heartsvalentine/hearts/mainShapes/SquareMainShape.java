@@ -33,8 +33,8 @@ public class SquareMainShape implements MainShape {
         if (sd instanceof DrawShapeDetails) {
             paint.setColor(((DrawShapeDetails) sd).getColor());
         } else if (sd instanceof EmojiShapeDetails) {
-            horizontalAdjustment = -8;
-            verticalAdjustment = 0;
+            horizontalAdjustment = ((EmojiShapeDetails) sd).getHorizontalAdjustment();
+            verticalAdjustment = ((EmojiShapeDetails) sd).getVerticalAdjustment();
         }
 
         int SquareLen = (int)(mainSizes.getWidth() - 2 * mainSizes.getMargin() - sd.getWidth());

@@ -1,7 +1,6 @@
 package com.example.heartsvalentine.hearts.shapeDetails;
 
 import android.graphics.Canvas;
-//import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -30,6 +29,7 @@ public class EmojiShapeDetails implements ShapeDetails {
         paint.getTextBounds(emoji, 0, emoji.length(), rectHeart);
 
         centerX = rectHeart.exactCenterX();
+        // This looks a quickfix for heart shape. Investigate properly when time.
         centerY = rectHeart.exactCenterY() - 12; // have to add 12 or trespasses
 
         switch (emoji) {
@@ -129,10 +129,140 @@ public class EmojiShapeDetails implements ShapeDetails {
                 height = (float) (rectHeart.height() * 0.95);
                 break;
 
+            case "\uD83D\uDC9D": // Present, wrapped heart with gold ribbon
+                width = (float) (rectHeart.width() * 1.0);
+                height = (float) (rectHeart.height() * 0.87);
+
             default:
                 width = (float) (rectHeart.width() * 0.89);
                 height = (float) (rectHeart.height() * 0.87);
         }
+    }
+
+    public float getVerticalAdjustment() {
+
+        switch (emoji) {
+            case "\uD83D\uDC8C️": // This is heart over envelop emoji 💌
+                return 28.5f;
+            case "\uD83D\uDC95":  // 2 hearts next to each other but not circling💕
+                return 2;
+            case "\uD83D\uDC9E": // 2 circling hearts next to each other 💞
+                return 0;
+            case "\uD83D\uDC93": // vibrating heart 💓
+                return 0;
+            case "\uD83D\uDC98":  // Arrow pierced heart    💘
+                return 0;
+            case "\uD83D\uDD34":  // red circle 🔴
+            case "\uD83D\uDFE0": // orange circle 🟠
+            case "\uD83D\uDFE1": // yellow circle 🟡
+            case "\uD83D\uDFE2": // green circle 🟢
+            case "\uD83D\uDD35": // blue circle
+            case "\uD83D\uDFE3": // purple circle
+            case "⚫": // black circle
+            case"⚪": // white circle
+            case "\uD83D\uDFE4": // brown circle🟤
+                return 0;
+            case "\uD83D\uDD3A": // Up red triangle 🔺
+            case "\uD83D\uDD3B": // Down red triangle 🔻
+                return 45;
+            case "\uD83D\uDD38": // yellow small diamond 🔸
+            case "\uD83D\uDD39": // blue small diamond 🔹
+                return 52;
+            case "\uD83D\uDD36": // yellow large diamond 🔶
+            case "\uD83D\uDD37": // blue large diamond 🔷
+            case "\uD83D\uDFE5": // red square 🟥
+            case "\uD83D\uDFE7": // orange square 🟧
+            case "\uD83D\uDFE8": // yellow square 🟨
+            case "\uD83D\uDFE9": // green square 🟩
+            case "\uD83D\uDFE6": // blue square 🟦
+            case "\uD83D\uDFEA": // purple square 🟪
+            case "⬛": // black square ⬛
+            case "⬜": // white square ⬜
+            case "\uD83D\uDFEB": // brown square 🟫
+            case "♠": // spade ♠️
+            case "♣": // club ♣
+            case "♦": // diamond ♦
+            case "\uD83D\uDCA7":    // Water drop 💧
+                return 1;
+            case "\uD83E\uDE78": // Blood drop 🩸
+                return 2;
+            case "⭐": // Star
+                return 4;
+            case "\uD83C\uDF1F": // Shaking star 🌟
+                return -5;
+            case "✨": // 3 stars ✨
+                return 4;
+            case "\uD83D\uDCA5": // explosion 💥
+                return 2;
+            case "\uD83D\uDD25": // fire 🔥
+                return 0;
+            case "☀": // Sun ☀️
+                return 0;
+        }
+
+        return 8;
+    }
+
+    public float getHorizontalAdjustment() {
+
+        switch (emoji) {
+            case "\uD83D\uDC98":  // Arrow pierced heart    💘
+                return -10;
+            case "\uD83D\uDC9D": // // Present, wrapped heart with gold ribbon
+                return -10;
+            case "\uD83D\uDD34":  // red circle 🔴
+            case "\uD83D\uDFE0": // orange circle 🟠
+            case "\uD83D\uDFE1": // yellow circle 🟡
+            case "\uD83D\uDFE2": // green circle 🟢
+            case "\uD83D\uDD35": // blue circle
+            case "\uD83D\uDFE3": // purple circle
+            case "⚫": // black circle
+            case"⚪": // white circle
+            case "\uD83D\uDFE4": // brown circle🟤
+                return -10;
+            case "\uD83D\uDD3A": // Up red triangle 🔺
+            case "\uD83D\uDD3B": // Down red triangle 🔻
+                return -47;
+            case "\uD83D\uDD38": // yellow small diamond 🔸
+            case "\uD83D\uDD39": // blue small diamond 🔹
+                return -60;
+            case "\uD83D\uDD36": // yellow large diamond 🔶
+            case "\uD83D\uDD37": // blue large diamond 🔷
+            case "\uD83D\uDFE5": // red square 🟥
+            case "\uD83D\uDFE7": // orange square 🟧
+            case "\uD83D\uDFE8": // yellow square 🟨
+            case "\uD83D\uDFE9": // green square 🟩
+            case "\uD83D\uDFE6": // blue square 🟦
+            case "\uD83D\uDFEA": // purple square 🟪
+            case "⬛": // black square ⬛
+            case "⬜": // white square ⬜
+            case "\uD83D\uDFEB": // brown square 🟫
+                return -11;
+            case "♠": // spade ♠️
+                return -18;
+            case "♣": // club ♣
+                return -13;
+            case "♦": // diamond ♦
+                return -32;
+            case "\uD83D\uDCA7":    // Water drop 💧
+                return -44;
+            case "\uD83E\uDE78": // Blood drop 🩸
+                return -37;
+            case "⭐": // Star
+                return -10;
+            case "\uD83C\uDF1F": // Shaking star 🌟
+                return -10;
+            case "✨": // 3 stars ✨
+                return -10;
+            case "\uD83D\uDCA5": // explosion 💥
+                return -10;
+            case "\uD83D\uDD25": // fire 🔥
+                return -28;
+            case "☀": // Sun ☀️
+                return -11;
+        }
+
+        return -8;
     }
 
 /* Utility for testing placement of emojis.

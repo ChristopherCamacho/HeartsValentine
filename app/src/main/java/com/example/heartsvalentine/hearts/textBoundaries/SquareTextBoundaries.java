@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import com.example.heartsvalentine.hearts.TextFormattingDetails;
 import com.example.heartsvalentine.hearts.TextRectDetails;
 import com.example.heartsvalentine.hearts.mainSizes.SquareMainSizes;
+import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
 
 import java.util.ArrayList;
@@ -29,7 +30,13 @@ public class SquareTextBoundaries implements TextBoundaries {
     }
 
     public List<TextRectDetails> computeTextRectangles() {
-        RectF rect = new RectF(mainSizes.getMargin() + sd.getWidth(), mainSizes.getMargin() + sd.getHeight(),
+        float verticalAdjustment = 0;
+
+        if (sd instanceof EmojiShapeDetails) {
+            verticalAdjustment = ((EmojiShapeDetails) sd).getVerticalAdjustment();
+        }
+
+        RectF rect = new RectF(mainSizes.getMargin() + sd.getWidth(), mainSizes.getMargin() + sd.getHeight() + verticalAdjustment,
                 mainSizes.getWidth() - mainSizes.getMargin() - sd.getWidth(), mainSizes.getHeight() - mainSizes.getMargin() - sd.getHeight());
         //innerRect delimitates the area for drawing text.
         RectF innerRect = new RectF(rect.left + tfd.getTxtHeartsMargin(), rect.top+ tfd.getTxtHeartsMargin(), rect.right - tfd.getTxtHeartsMargin(), rect.bottom - tfd.getTxtHeartsMargin());
