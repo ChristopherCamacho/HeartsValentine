@@ -54,17 +54,14 @@ public class CircleTextBoundaries implements TextBoundaries {
         float innerTextBottomLine = innerRect.bottom + textDescent + topBottomMargin;
         int numLines = (int)Math.floor((innerTextBottomLine - innerTextTopLine)/tfd.getLineHeight());
         float lineHeight = (innerTextBottomLine - innerTextTopLine)/numLines;
-        int lineIdx = 0;
 
-        while (lineIdx <= numLines) {
+        for (int lineIdx = 0; lineIdx < numLines; lineIdx++) {
             float yPos = innerTextTopLine + lineIdx*lineHeight;
             int[] xTopPts = getXEllipseIntersectionsFromY(yPos);
             int[] xBottomPts = getXEllipseIntersectionsFromY(yPos - textAscent);
 
             Rect rc = new Rect(Math.max(xTopPts[0], xBottomPts[0]), (int)(yPos - (textAscent + textDescent)), Math.min(xTopPts[1], xBottomPts[1]), (int)(yPos - textAscent));
             rectLst.add(new TextRectDetails(rc));
-
-            lineIdx++;
         }
         return rectLst;
     }
