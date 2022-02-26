@@ -411,8 +411,8 @@ final class DrawText {
 													badFit = false;
 												}
 											}
-											
-											if (!rectLstIterator.hasNext()) {
+											// badFit is important. Otherwise we exit loop which results in all text fits = false when all text could fit in.
+											if (!rectLstIterator.hasNext() && badFit) {
 												breakLoop = true;
 												break;	
 											}
@@ -600,7 +600,6 @@ final class DrawText {
 							}
 						}
 					} else {
-						// g2d.drawChars(txt.toCharArray(), 0, txt.length(), txtBoundingRect.x, txtBoundingRect.y + txtBoundingRect.height - textDescent);
 						g2d.drawText(txt, txtBoundingRect.left, txtBoundingRect.top, paint);
 					}
 				}

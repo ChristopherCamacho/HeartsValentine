@@ -41,14 +41,15 @@ public class SquareTextBoundaries implements TextBoundaries {
         //innerRect delimitates the area for drawing text.
         RectF innerRect = new RectF(rect.left + tfd.getTxtHeartsMargin(), rect.top+ tfd.getTxtHeartsMargin(), rect.right - tfd.getTxtHeartsMargin(), rect.bottom - tfd.getTxtHeartsMargin());
 
-        float innerTextTopLine = innerRect.top - (textAscent + textDescent); // Top text line position
-        float innerTextBottomLine = innerRect.bottom - textAscent; // Bottom of last line position
+        float innerTextTopLine = innerRect.top - textAscent; // Top text line position
+        float innerTextBottomLine = innerRect.bottom - textDescent; // Bottom of last line position
 
         int numLines = (int)Math.floor((innerTextBottomLine - innerTextTopLine)/tfd.getLineHeight());
         float lineHeight = (innerTextBottomLine - innerTextTopLine)/numLines;
 
         for (int rectIdx = 0; rectIdx <= numLines; rectIdx++) {
-            Rect rc = new Rect((int)innerRect.left, (int)(innerTextTopLine + rectIdx*lineHeight), (int)innerRect.right, (int)(innerTextTopLine + rectIdx*lineHeight - textAscent));
+            // The top of rectangle is y-coordinate of where text is written. Bottom is lowest point of text
+            Rect rc = new Rect((int)innerRect.left, (int)(innerTextTopLine + rectIdx*lineHeight), (int)innerRect.right, (int)(innerTextTopLine + rectIdx*lineHeight + textDescent));
             rectLst.add(new TextRectDetails(rc));
         }
         return rectLst;

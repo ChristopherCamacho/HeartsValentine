@@ -50,8 +50,8 @@ public class CircleTextBoundaries implements TextBoundaries {
         // InnerRect delimitates the area for drawing text.
         RectF innerRect = new RectF(rect.left + tfd.getTxtHeartsMargin(), rect.top + tfd.getTxtHeartsMargin(), rect.right - tfd.getTxtHeartsMargin(), rect.bottom - tfd.getTxtHeartsMargin());
         float topBottomMargin = -50;
-        float innerTextTopLine = innerRect.top - topBottomMargin;// - tfd.getTopTextMargin(); // Top text line position
-        float innerTextBottomLine = innerRect.bottom + textDescent + topBottomMargin;// + tfd.getTopTextMargin(); // Bottom of last line position
+        float innerTextTopLine = innerRect.top - topBottomMargin;
+        float innerTextBottomLine = innerRect.bottom + textDescent + topBottomMargin;
         int numLines = (int)Math.floor((innerTextBottomLine - innerTextTopLine)/tfd.getLineHeight());
         float lineHeight = (innerTextBottomLine - innerTextTopLine)/numLines;
         int lineIdx = 0;
