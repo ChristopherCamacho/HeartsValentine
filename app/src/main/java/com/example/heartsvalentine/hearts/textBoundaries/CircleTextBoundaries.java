@@ -37,8 +37,20 @@ public class CircleTextBoundaries implements TextBoundaries {
         // Horizontal and vertical radius
         double a = mainSizes.getWidth()/2.0 - mainSizes.getMargin() - sd.getWidth() - tfd.getTxtHeartsMargin();
         double b = mainSizes.getHeight()/2.0 - mainSizes.getMargin() - sd.getHeight()- tfd.getTxtHeartsMargin();
+
+        if (b == 0) {
+            b = 1;
+        }
+
+        double sqrtPart = 1 - Math.pow(y - Cy, 2)/(b*b);
+
+        if (sqrtPart < 0) {
+            sqrtPart = 0;
+        }
+
+        double otherSide = a*Math.sqrt(sqrtPart);
+
         int[] retVal = new int[2];
-        double otherSide = a*Math.sqrt(1 - Math.pow(y - Cy, 2)/(b*b));
         retVal[0] = (int)(Cx - otherSide);
         retVal[1] = (int)(Cx + otherSide);
         return retVal;
@@ -53,6 +65,10 @@ public class CircleTextBoundaries implements TextBoundaries {
         float innerTextTopLine = innerRect.top - topBottomMargin;
         float innerTextBottomLine = innerRect.bottom + textDescent + topBottomMargin;
         int numLines = (int)Math.floor((innerTextBottomLine - innerTextTopLine)/tfd.getLineHeight());
+
+        if (numLines <= 0){
+            numLines = 1;
+        }
         float lineHeight = (innerTextBottomLine - innerTextTopLine)/numLines;
 
         for (int lineIdx = 0; lineIdx < numLines; lineIdx++) {
