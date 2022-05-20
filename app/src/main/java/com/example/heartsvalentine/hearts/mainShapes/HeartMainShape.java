@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawShapeDetails;
 import com.example.heartsvalentine.hearts.mainSizes.HeartMainSizes;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.SymbolShapeDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,9 @@ public class HeartMainShape implements MainShape {
 
         if (sd instanceof DrawShapeDetails) {
             paint.setColor(((DrawShapeDetails)sd).getColor());
+        }
+        else if (sd instanceof SymbolShapeDetails) {
+            paint.setColor(((SymbolShapeDetails) sd).getColor());
         }
 
         List<Point> heartsLst = new ArrayList<>();

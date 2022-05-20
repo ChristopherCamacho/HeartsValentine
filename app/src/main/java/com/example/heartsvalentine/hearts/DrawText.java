@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import com.example.heartsvalentine.ShapeType;
+import com.example.heartsvalentine.frameShapes.ShapeType;
 import com.example.heartsvalentine.hearts.mainSizes.MainSizes;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
 import com.example.heartsvalentine.hearts.textBoundaries.TextBoundaries;

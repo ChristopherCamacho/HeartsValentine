@@ -44,4 +44,7 @@
     <string name="emoji">Emoji</string>
     <string name="edge_shape">Edge shape</string>
     <string name="main_shape">Main shape</string>
+    <string name="select_emoji">Select an emoji</string>
+    <string name="select_symbol">Select a symbol</string>
+    <string name="select_main_shape">Select a main shape</string>
 </resources>

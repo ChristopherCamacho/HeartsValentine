@@ -1,4 +1,4 @@
-package com.example.heartsvalentine;
+package com.example.heartsvalentine.frameShapes;
 
 public enum ShapeType {
     None,

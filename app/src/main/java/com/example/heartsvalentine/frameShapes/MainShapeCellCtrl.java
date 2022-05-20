@@ -1,4 +1,4 @@
-package com.example.heartsvalentine;
+package com.example.heartsvalentine.frameShapes;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,13 +7,18 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.example.heartsvalentine.R;
+import com.example.heartsvalentine.Utilities;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawCircleDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawClubDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawDiamondDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawHeartDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawSpadeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawSquareDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawStarDetails;
 
-public class ShapeCellCtrl extends View {
+public class MainShapeCellCtrl extends View {
     private final Paint paint = new Paint(/*Paint.ANTI_ALIAS_FLAG*/);
     private static int size;
     private static int borderWidth;
@@ -24,24 +29,23 @@ public class ShapeCellCtrl extends View {
     private boolean fillShape;
     private DrawShapeDetails drawShapeDetails = null;
     private float innerShapeBorder;
-    private boolean isActive = true;
 
-    public ShapeCellCtrl(Context context) {
+    public MainShapeCellCtrl(Context context) {
         super(context);
         initStandardSizes(context);
     }
 
-    public ShapeCellCtrl(Context context, AttributeSet attrs) {
+    public MainShapeCellCtrl(Context context, AttributeSet attrs) {
         super(context, attrs);
         initStandardSizes(context);
     }
 
-    public ShapeCellCtrl(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MainShapeCellCtrl(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initStandardSizes(context);
     }
 
-    public ShapeCellCtrl(Context context, ShapeType shapeType, boolean fillShape, boolean showBorder) {
+    public MainShapeCellCtrl(Context context, ShapeType shapeType, boolean fillShape, boolean showBorder) {
         super(context);
         initStandardSizes(context);
         this.shapeType = shapeType;
@@ -81,6 +85,18 @@ public class ShapeCellCtrl extends View {
                 drawShapeDetails = new DrawStarDetails(getContext().getResources().getColor(R.color.black), innerShapeWidth);
                 break;
 
+            case Spade:
+                drawShapeDetails = new DrawSpadeDetails(getContext().getResources().getColor(R.color.black), innerShapeWidth);
+                break;
+
+            case Club:
+                drawShapeDetails = new DrawClubDetails(getContext().getResources().getColor(R.color.black), innerShapeWidth);
+                break;
+
+            case Diamond:
+                drawShapeDetails = new DrawDiamondDetails(getContext().getResources().getColor(R.color.black), innerShapeWidth);
+                break;
+
             default:
         }
     }
@@ -116,11 +132,6 @@ public class ShapeCellCtrl extends View {
         isSelected = selected;
     }
 
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-        invalidate();
-    }
-
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
@@ -142,14 +153,8 @@ public class ShapeCellCtrl extends View {
             canvas.drawRect(boundingRect, paint);
         }
 
-        if (!isActive) {
-            paint.setColor(getContext().getResources().getColor(R.color.midDayFog));
-            paint.setStyle(Paint.Style.FILL);
-            canvas.drawRect(boundingRect, paint);
-        }
-
         if (drawShapeDetails != null) {
-            int shapeColor = getContext().getResources().getColor(isActive? R.color.black : R.color.fog);
+            int shapeColor = getContext().getResources().getColor(R.color.black);
             drawShapeDetails.setColor(shapeColor);
         }
 

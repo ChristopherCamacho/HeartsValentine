@@ -7,10 +7,11 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 
 import com.example.heartsvalentine.R;
-import com.example.heartsvalentine.ShapeType;
+import com.example.heartsvalentine.frameShapes.ShapeType;
 import com.example.heartsvalentine.hearts.mainShapes.MainShape;
 import com.example.heartsvalentine.hearts.mainSizes.MainSizes;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.SymbolShapeDetails;
 
 // https://stackoverflow.com/questions/27588965/how-to-use-custom-font-in-a-project-written-in-android-studio
 
@@ -206,6 +207,14 @@ public class DrawHeartsValentine {
 			esd.drawEmojiWithBoundaries(canvas, paint);
 		}
 		*/
+
+
+		if (sd instanceof SymbolShapeDetails) {
+			SymbolShapeDetails esd = (SymbolShapeDetails)sd;
+			esd.drawEmojiWithBoundaries(canvas, paint);
+		}
+
+
 
 		// Draw hearts...
 		MainShape ms = ObjectFromShapeType.getMainShape(mainShapeType, canvas, mainSizes, closestDistance, sd);

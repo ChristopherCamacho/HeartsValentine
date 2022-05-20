@@ -1,11 +1,16 @@
 package com.example.heartsvalentine;
 
+import com.example.heartsvalentine.frameShapes.ShapeType;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawCircleDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawClubDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawDiamondDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawHeartDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawSpadeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawSquareDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawStarDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.SymbolShapeDetails;
 
 // This class holds all the parameters needed to create the image
 public class HeartValParameters {
@@ -22,6 +27,7 @@ public class HeartValParameters {
     private String emoji = Character.toString((char) 0x2665);
     private ShapeType shapeType = ShapeType.StraightHeart;
     private ShapeType mainShape = ShapeType.StraightHeart;
+    private String symbol = "☻";
 
     HeartValParameters() {
     }
@@ -75,11 +81,11 @@ public class HeartValParameters {
         return textColor;
     }
 
-    void setHeartsColor(int heartsColor) {
+    public void setHeartsColor(int heartsColor) {
         this.heartsColor = heartsColor;
     }
 
-    int getHeartsColor() {
+    public int getHeartsColor() {
         return heartsColor;
     }
 
@@ -91,33 +97,36 @@ public class HeartValParameters {
         return backgroundColor;
     }
 
-    void setUseEmoji(boolean useEmoji) {
+    public void setUseEmoji(boolean useEmoji) {
         this.useEmoji = useEmoji;
     }
 
-    boolean getUseEmoji() {
+    public boolean getUseEmoji() {
         return useEmoji;
     }
 
-    void setEmoji(String emoji) {
+    public void setEmoji(String emoji) {
         this.emoji = emoji;
     }
 
-    String getEmoji() {
+    public String getEmoji() {
         return emoji;
     }
 
-    void setShapeType(ShapeType shapeType) {
+    public void setShapeType(ShapeType shapeType) {
         this.shapeType = shapeType;
     }
 
-    ShapeType getShapeType() {
+    public ShapeType getShapeType() {
         return shapeType;
     }
 
     ShapeDetails getShapeDetails() {
         if (useEmoji) {
             return new EmojiShapeDetails(emoji);
+        }
+        else if (symbol != null && shapeType == ShapeType.None) {
+            return new SymbolShapeDetails(symbol, heartsColor);
         }
 
         switch (shapeType) {
@@ -129,16 +138,30 @@ public class HeartValParameters {
                 return new DrawSquareDetails(heartsColor, 92);
             case Star:
                 return new DrawStarDetails(heartsColor, 92);
+            case Spade:
+                return new DrawSpadeDetails(heartsColor, 92);
+            case Club:
+                return new DrawClubDetails(heartsColor, 92);
+            case Diamond:
+                return new DrawDiamondDetails(heartsColor, 92);
         }
 
         return null;
     }
 
-    void setMainShape(ShapeType shapeType) {
+    public void setMainShape(ShapeType shapeType) {
         this.mainShape = shapeType;
     }
 
-    ShapeType getMainShape() {
+    public ShapeType getMainShape() {
         return mainShape;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 }

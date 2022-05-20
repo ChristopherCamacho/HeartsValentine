@@ -1,4 +1,4 @@
-package com.example.heartsvalentine;
+package com.example.heartsvalentine.frameShapes;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -9,8 +9,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -21,10 +19,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.heartsvalentine.HeartValParameters;
+import com.example.heartsvalentine.R;
+import com.example.heartsvalentine.Settings;
+import com.example.heartsvalentine.Utilities;
 import com.example.heartsvalentine.viewModels.HeartValParametersViewModel;
 
 import top.defaults.colorpicker.ColorPickerPopup;
@@ -35,7 +35,7 @@ public class FrameShapes extends Fragment {
     HeartValParameters hvp;
     EmojiCellCtrl emojiButton;
     ShapeCellCtrl filledShapeButton;
-    ShapeCellCtrl unfilledShapeButton;
+    MainShapeCellCtrl unfilledShapeButton;
     Point emojiPopUpPt, shapePopUpPt, mainShapePopupPt;
     Boolean popUpPointsInitialized = false;
     Boolean useEmojiSwitch = false;
@@ -67,12 +67,16 @@ public class FrameShapes extends Fragment {
 
         emojiButton = view.findViewById(R.id.emojiButton);
         emojiButton.setEmoji(hvp.getEmoji());
-        emojiButton.setOnClickListener(v -> openEmojiPopup(view));
+        emojiButton.setOnClickListener(v -> openEmojiPopup());
 
         filledShapeButton = view.findViewById(R.id.filledShapeButton);
-        filledShapeButton.setFillShape(true);
-        filledShapeButton.setShapeType(hvp.getShapeType());
-        filledShapeButton.setOnClickListener(v -> openShapePopup(view));
+        if (hvp.getShapeType() == ShapeType.None) {
+            filledShapeButton.setSymbol(hvp.getSymbol());
+        }
+        else {
+            filledShapeButton.setShapeType(hvp.getShapeType());
+        }
+        filledShapeButton.setOnClickListener(v -> openShapePopup());
 
         activateDeactivateHeartColorButton(view, !hvp.getUseEmoji());
         androidx.appcompat.widget.SwitchCompat useEmojiSwitch = view.findViewById(R.id.useEmojiSwitch);
@@ -83,11 +87,11 @@ public class FrameShapes extends Fragment {
         unfilledShapeButton = view.findViewById(R.id.unfilledShapeButton);
         unfilledShapeButton.setFillShape(false);
         unfilledShapeButton.setShapeType(hvp.getMainShape());
-        unfilledShapeButton.setOnClickListener(v -> openMainShapePopup(view));
+        unfilledShapeButton.setOnClickListener(v -> openMainShapePopup());
 
     }
 
-    private void initializePopUpPoints(View view) {
+    private void initializePopUpPoints() {
         if (!popUpPointsInitialized) {
             popUpPointsInitialized = true;
 
@@ -95,8 +99,6 @@ public class FrameShapes extends Fragment {
             shapePopUpPt = new Point();
             mainShapePopupPt = new Point();
 
-            FrameLayout emojiButtonFrameLayout = view.findViewById(R.id.emojiButtonFrameLayout);
-            LinearLayout.LayoutParams lpEmojiButtonFrame = (LinearLayout.LayoutParams) emojiButtonFrameLayout.getLayoutParams();
             Point screenSizePt;
             Context context = getContext();
 
@@ -106,43 +108,16 @@ public class FrameShapes extends Fragment {
                 screenSizePt = new Point();
             }
 
-            emojiPopUpPt.x = screenSizePt.x - lpEmojiButtonFrame.getMarginEnd();
-
-            int topHeight = Utilities.getTotalTopHeight(this.getContext());
-
-            AppCompatButton backButton = view.findViewById(R.id.backButton);
-            LinearLayout.LayoutParams lpBackButton = (LinearLayout.LayoutParams) backButton.getLayoutParams();
-            int totalHeightBackButtonLayout = backButton.getHeight() + lpBackButton.topMargin + lpBackButton.bottomMargin;
-
-            SwitchCompat useEmojiSwitch = view.findViewById(R.id.useEmojiSwitch);
-            LinearLayout.LayoutParams lpUseEmojiSwitch = (LinearLayout.LayoutParams) useEmojiSwitch.getLayoutParams();
-            int totalHeightUseEmojiSwitch = useEmojiSwitch.getHeight() + lpUseEmojiSwitch.topMargin + lpUseEmojiSwitch.bottomMargin;
-
-            int correction = (int) Utilities.convertDpToPixel(8, getContext()); // Don't see where this comes from or what I have overlooked?
-
-            emojiPopUpPt.y = topHeight + totalHeightBackButtonLayout + totalHeightUseEmojiSwitch + lpEmojiButtonFrame.topMargin + correction + emojiButton.getHeight();
+            emojiPopUpPt.x = screenSizePt.x;
+            emojiPopUpPt.y = screenSizePt.y;
 
             // now the shape button
-            FrameLayout filledShapeButtonFrameLayout = view.findViewById(R.id.filledShapeButtonFrameLayout);
-            LinearLayout.LayoutParams lpFilledShapeButtonFrame = (LinearLayout.LayoutParams) filledShapeButtonFrameLayout.getLayoutParams();
-
-            shapePopUpPt.x = screenSizePt.x - lpFilledShapeButtonFrame.getMarginEnd();
-            shapePopUpPt.y = emojiPopUpPt.y + lpEmojiButtonFrame.height + lpEmojiButtonFrame.bottomMargin + lpFilledShapeButtonFrame.topMargin;
+            shapePopUpPt.x = screenSizePt.x;
+            shapePopUpPt.y = emojiPopUpPt.y;
 
             // now the main shape popup button
-
-            FrameLayout shapeColorFrameLayout = view.findViewById(R.id.shapeColorFrameLayout);
-            LinearLayout.LayoutParams lpShapeColorFrame = (LinearLayout.LayoutParams) shapeColorFrameLayout.getLayoutParams();
-
-
-            FrameLayout unfilledShapeButtonFrameLayout = view.findViewById(R.id.unfilledShapeButtonFrameLayout);
-            LinearLayout.LayoutParams lpUnFilledShapeButtonFrame = (LinearLayout.LayoutParams) unfilledShapeButtonFrameLayout.getLayoutParams();
-
-            int correction2 = (int) Utilities.convertDpToPixel(4, getContext()); // Don't see where this comes from or what I have overlooked?
-
-            mainShapePopupPt.x = screenSizePt.x - lpUnFilledShapeButtonFrame.getMarginEnd();
-            mainShapePopupPt.y = shapePopUpPt.y + lpFilledShapeButtonFrame.height + lpFilledShapeButtonFrame.bottomMargin +
-                    lpShapeColorFrame.height + lpShapeColorFrame.bottomMargin + lpUnFilledShapeButtonFrame.topMargin + correction2;
+            mainShapePopupPt.x = screenSizePt.x;
+            mainShapePopupPt.y = screenSizePt.y;
         }
     }
 
@@ -227,12 +202,12 @@ public class FrameShapes extends Fragment {
         heartsColorButton.setBackgroundColor(activate? hvp.getHeartsColor() : hvp.getHeartsColor() & 0x88FFFFFF);
     }
 
-    void openEmojiPopup(@NonNull View view) {
+    void openEmojiPopup() {
         if (!useEmojiSwitch) {
             return;
         }
 
-        initializePopUpPoints(view);
+        initializePopUpPoints();
 
         Dialog alertDialog = new Dialog(this.getContext());
 
@@ -248,8 +223,10 @@ public class FrameShapes extends Fragment {
         layoutParams.copyFrom(alertDialog.getWindow().getAttributes());
         layoutParams.gravity = Gravity.TOP | Gravity.START;
 
-        layoutParams.x = emojiPopUpPt.x - etc.getComputedWidth();
-        layoutParams.y = emojiPopUpPt.y + etc.getComputedStartDrawHeight();
+        layoutParams.x = 0;//emojiPopUpPt.x - etc.getComputedWidth();
+        layoutParams.y = 0;//emojiPopUpPt.y + etc.getComputedStartDrawHeight();
+        layoutParams.width = mainShapePopupPt.x;
+        layoutParams.height = mainShapePopupPt.y;
 
         alertDialog.getWindow().setAttributes(layoutParams);
         etc.setOnClickListener(v -> emojiPopupReceivedClick(alertDialog));
@@ -261,17 +238,17 @@ public class FrameShapes extends Fragment {
         hvp.setEmoji(emojiButton.getEmoji());
     }
 
-    void openShapePopup(@NonNull View view) {
+    void openShapePopup() {
         if (useEmojiSwitch) {
             return;
         }
 
-        initializePopUpPoints(view);
+        initializePopUpPoints();
 
         Dialog alertDialog = new Dialog(this.getContext());
-        ShapeType[] shapeTypeArray = {ShapeType.StraightHeart, ShapeType.Circle, ShapeType.Square, ShapeType.Star};
-        ShapeTableCtrl stc = new ShapeTableCtrl(this.getContext(), shapeTypeArray);
-        stc.setSelectedEmojiCtrl(filledShapeButton);
+      //  ([ShapeType, String])[] shapeTypeArray = {[ShapeType.StraightHeart, 0], ShapeType.Circle, ShapeType.Square, ShapeType.Star, ShapeType.Spade, ShapeType.Club, ShapeType.Diamond};
+        ShapeTableCtrl stc = new ShapeTableCtrl(this.getContext());
+        stc.setSelectedShapeCtrl(filledShapeButton);
 
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -282,8 +259,8 @@ public class FrameShapes extends Fragment {
         layoutParams.copyFrom(alertDialog.getWindow().getAttributes());
         layoutParams.gravity = Gravity.TOP | Gravity.START;
 
-        layoutParams.x = shapePopUpPt.x - stc.getComputedWidth();
-        layoutParams.y = shapePopUpPt.y + stc.getComputedStartDrawHeight();
+        layoutParams.x = shapePopUpPt.x;// - stc.getComputedWidth();
+        layoutParams.y = shapePopUpPt.y;// + stc.getComputedStartDrawHeight();
 
         alertDialog.getWindow().setAttributes(layoutParams);
         stc.setOnClickListener(v -> openShapePopupReceivedClick(alertDialog));
@@ -293,30 +270,33 @@ public class FrameShapes extends Fragment {
     void openShapePopupReceivedClick(Dialog alertDialog) {
         alertDialog.dismiss();
         hvp.setShapeType(filledShapeButton.getShapeType());
+        hvp.setSymbol(filledShapeButton.getSymbol());
     }
 
-    void openMainShapePopup(@NonNull View view) {
-        initializePopUpPoints(view);
+    void openMainShapePopup() {
+        initializePopUpPoints();
 
         Dialog alertDialog = new Dialog(this.getContext());
         ShapeType[] shapeTypeArray = {ShapeType.StraightHeart, ShapeType.Circle, ShapeType.Square};
-        ShapeTableCtrl stc = new ShapeTableCtrl(this.getContext(), shapeTypeArray, false);
-        stc.setSelectedEmojiCtrl(unfilledShapeButton);
+        MainShapeTableCtrl mSTC = new MainShapeTableCtrl(this.getContext(), shapeTypeArray, false);
+        mSTC.setSelectedEmojiCtrl(unfilledShapeButton);
 
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        alertDialog.setContentView(stc);
+        alertDialog.setContentView(mSTC);
 
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         layoutParams.copyFrom(alertDialog.getWindow().getAttributes());
         layoutParams.gravity = Gravity.TOP | Gravity.START;
 
-        layoutParams.x = mainShapePopupPt.x - stc.getComputedWidth();
-        layoutParams.y = mainShapePopupPt.y + stc.getComputedStartDrawHeight();
+        layoutParams.x = 0;
+        layoutParams.y = 0;
+        layoutParams.width = mainShapePopupPt.x;
+        layoutParams.height = mainShapePopupPt.y;
 
         alertDialog.getWindow().setAttributes(layoutParams);
-        stc.setOnClickListener(v -> openMainShapePopupReceivedClick(alertDialog));
+        mSTC.setOnClickListener(v -> openMainShapePopupReceivedClick(alertDialog));
         alertDialog.show();
     }
 

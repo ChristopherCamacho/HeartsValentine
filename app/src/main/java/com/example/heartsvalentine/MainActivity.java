@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.example.heartsvalentine.frameShapes.ShapeType;
 import com.example.heartsvalentine.viewModels.FileNameHplMapViewModel;
 import com.example.heartsvalentine.viewModels.HeartValParametersViewModel;
 import com.example.heartsvalentine.viewModels.HeartsValBitmapViewModel;
@@ -232,6 +233,10 @@ public class MainActivity extends AppCompatActivity {
 
                         String mainShape = (String) jsonObject.get("mainShape");
                         hvp.setMainShape(ShapeType.valueOf(mainShape));
+
+                        // Added last so if others fail, this will too.
+                        String symbol = (String) jsonObject.get("symbol");
+                        hvp.setSymbol(symbol);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -358,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
         jsonObject.put("emoji", hvp.getEmoji());
         jsonObject.put("shapeType", hvp.getShapeType());
         jsonObject.put("mainShape", hvp.getMainShape());
+        jsonObject.put("symbol", hvp.getSymbol());
         return jsonObject;
     }
 }

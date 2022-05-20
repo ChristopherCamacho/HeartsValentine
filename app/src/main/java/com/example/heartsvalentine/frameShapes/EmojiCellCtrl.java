@@ -1,4 +1,4 @@
-package com.example.heartsvalentine;
+package com.example.heartsvalentine.frameShapes;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,6 +7,9 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.example.heartsvalentine.R;
+import com.example.heartsvalentine.Utilities;
 
 public class EmojiCellCtrl extends View {
 

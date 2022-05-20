@@ -79,7 +79,7 @@
                         android:layout_marginBottom="2dp"
                         android:layout_marginEnd="2dp"
                         android:background="@color/white"/>
-                    <com.example.heartsvalentine.EmojiCellCtrl
+                    <com.example.heartsvalentine.frameShapes.EmojiCellCtrl
                         android:id="@+id/emojiButton"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
@@ -128,7 +128,7 @@
                         android:layout_marginBottom="2dp"
                         android:layout_marginEnd="2dp"
                         android:background="@color/white"/>
-                    <com.example.heartsvalentine.ShapeCellCtrl
+                    <com.example.heartsvalentine.frameShapes.ShapeCellCtrl
                         android:id="@+id/filledShapeButton"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
@@ -225,7 +225,7 @@
                         android:layout_marginBottom="2dp"
                         android:layout_marginEnd="2dp"
                         android:background="@color/white"/>
-                    <com.example.heartsvalentine.ShapeCellCtrl
+                    <com.example.heartsvalentine.frameShapes.MainShapeCellCtrl
                         android:id="@+id/unfilledShapeButton"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"

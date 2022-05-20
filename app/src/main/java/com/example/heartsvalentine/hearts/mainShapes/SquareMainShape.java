@@ -8,6 +8,7 @@ import com.example.heartsvalentine.hearts.mainSizes.SquareMainSizes;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.SymbolShapeDetails;
 
 public class SquareMainShape implements MainShape {
     SquareMainSizes mainSizes;
@@ -35,6 +36,11 @@ public class SquareMainShape implements MainShape {
         } else if (sd instanceof EmojiShapeDetails) {
             horizontalAdjustment = ((EmojiShapeDetails) sd).getHorizontalAdjustment();
             verticalAdjustment = ((EmojiShapeDetails) sd).getVerticalAdjustment();
+        }
+        else if (sd instanceof SymbolShapeDetails) {
+            paint.setColor(((SymbolShapeDetails) sd).getColor());
+            //  horizontalAdjustment = ((EmojiShapeDetails) sd).getHorizontalAdjustment() - 3;
+            //  verticalAdjustment = ((EmojiShapeDetails) sd).getVerticalAdjustment();
         }
 
         int SquareLen = (int)(mainSizes.getWidth() - 2 * mainSizes.getMargin() - sd.getWidth());

@@ -2,7 +2,6 @@ package com.example.heartsvalentine;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.text.Editable;
@@ -25,6 +23,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.heartsvalentine.frameShapes.FrameShapes;
 import com.example.heartsvalentine.viewModels.FileNameHplMapViewModel;
 import com.example.heartsvalentine.viewModels.HeartValParametersViewModel;
 import com.example.heartsvalentine.viewModels.HplFileNameMapViewModel;

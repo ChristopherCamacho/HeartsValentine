@@ -3,7 +3,7 @@ package com.example.heartsvalentine.hearts;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import com.example.heartsvalentine.ShapeType;
+import com.example.heartsvalentine.frameShapes.ShapeType;
 import com.example.heartsvalentine.hearts.mainShapes.CircleMainShape;
 import com.example.heartsvalentine.hearts.mainShapes.HeartMainShape;
 import com.example.heartsvalentine.hearts.mainShapes.MainShape;

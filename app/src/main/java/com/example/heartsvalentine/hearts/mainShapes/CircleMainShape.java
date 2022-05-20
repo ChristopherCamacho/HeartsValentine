@@ -8,6 +8,7 @@ import com.example.heartsvalentine.hearts.mainSizes.SquareMainSizes;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.SymbolShapeDetails;
 
 public class CircleMainShape implements MainShape {
     SquareMainSizes mainSizes;
@@ -36,6 +37,11 @@ public class CircleMainShape implements MainShape {
         else if (sd instanceof EmojiShapeDetails) {
             horizontalAdjustment = ((EmojiShapeDetails) sd).getHorizontalAdjustment() - 3;
             verticalAdjustment = ((EmojiShapeDetails) sd).getVerticalAdjustment();
+        }
+        else if (sd instanceof SymbolShapeDetails) {
+            paint.setColor(((SymbolShapeDetails) sd).getColor());
+          //  horizontalAdjustment = ((EmojiShapeDetails) sd).getHorizontalAdjustment() - 3;
+          //  verticalAdjustment = ((EmojiShapeDetails) sd).getVerticalAdjustment();
         }
 
         float ptCentreX = mainSizes.getWidth()/2.0f;
