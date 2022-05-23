@@ -35,14 +35,14 @@ public class HeartMainShape implements MainShape {
 
         if (left) {
             while (angle < beta) {
-                heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) - sd.getCenterX()), (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) -  sd.getCenterY())));
+                heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) - sd.getCenterX()), (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) - sd.getCenterY())));
                 angle += gamma;
                 heartCount++;
             }
         }
         else {
             while (angle > -beta + Math.PI) {
-                heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) -  sd.getCenterX()),  (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) -  sd.getCenterY())));
+                heartsLst.add(new Point((int)(ptCircleCentre.x + mainSizes.getRadius() * Math.cos(angle) - sd.getCenterX()),  (int)(ptCircleCentre.y - mainSizes.getRadius() * Math.sin(angle) - sd.getCenterY())));
                 angle -= gamma;
                 heartCount++;
             }
@@ -101,7 +101,14 @@ public class HeartMainShape implements MainShape {
         List<Point> heartsLst = new ArrayList<>();
 
         // left circle
-        Point ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius() +  sd.getCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() -  sd.getCenterY()));
+        Point ptLeftTopCircleCentre;
+
+        if (sd instanceof SymbolShapeDetails) {
+            ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius()  +  sd.getWidth()/2.0f), (int)(mainSizes.getMargin() + mainSizes.getRadius()  +  sd.getHeight()/2.0f));
+        }
+        else {
+            ptLeftTopCircleCentre = new Point((int) (mainSizes.getMargin() + mainSizes.getRadius() + sd.getCenterX()), (int) (mainSizes.getMargin() + mainSizes.getRadius() - sd.getCenterY()));
+        }
 
         double startAngle = Math.acos((mainSizes.getWidth()/2.0 - ptLeftTopCircleCentre.x)/mainSizes.getRadius());
         double vertDistBottomPt = mainSizes.getHeight() - 2 * mainSizes.getMargin() - mainSizes.getRadius(); // y-coordinate top circle centres - y coordinate of bottom of heart
@@ -151,7 +158,14 @@ public class HeartMainShape implements MainShape {
         }
 
         // right circle
-        Point ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() -  sd.getCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() - sd.getCenterY()));
+        Point ptRightTopCircleCentre;
+
+        if (sd instanceof SymbolShapeDetails) {
+            ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() - sd.getWidth()/2.0f), (int)(mainSizes.getMargin() + mainSizes.getRadius() + sd.getHeight()/2.0f));
+        }
+        else {
+            ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() - sd.getCenterX()), (int)(mainSizes.getMargin() + mainSizes.getRadius() - sd.getCenterY()));
+        }
 
         computeSideHearts(totalHeartCount, distance, startAngle, beta, heartsLst, ptRightTopCircleCentre, false);
 

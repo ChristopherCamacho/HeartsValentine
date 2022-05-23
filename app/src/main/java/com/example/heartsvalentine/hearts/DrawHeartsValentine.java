@@ -208,14 +208,6 @@ public class DrawHeartsValentine {
 		}
 		*/
 
-
-		if (sd instanceof SymbolShapeDetails) {
-			SymbolShapeDetails esd = (SymbolShapeDetails)sd;
-			esd.drawEmojiWithBoundaries(canvas, paint);
-		}
-
-
-
 		// Draw hearts...
 		MainShape ms = ObjectFromShapeType.getMainShape(mainShapeType, canvas, mainSizes, closestDistance, sd);
 
