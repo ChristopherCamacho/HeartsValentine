@@ -515,9 +515,25 @@ final class DrawText {
 			e.printStackTrace();
 		}
 	}
+
+	/*
+	//void drawTextBoundingRectangles() {
+	//	int col = paint.getColor();
+	//	paint.setColor(Color.BLUE);
+    //
+	//	for (TextRectDetails txtRectDetails : rectLst) {
+	//		Rect txtBoundingRect = txtRectDetails.getBoundingRect();
+	//		g2d.drawRect(txtBoundingRect, paint);
+		}
+		paint.setColor(col);
+	}
+	*/
 		 		
 	void draw() {
 		try {
+			// Uncomment for testing purpose
+			//drawTextBoundingRectangles();
+
 			paint.setColor(tfd.getTxtColour());
 
 			for (TextRectDetails txtRectDetails : rectLst) {

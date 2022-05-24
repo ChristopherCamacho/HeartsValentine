@@ -9,6 +9,7 @@ import com.example.heartsvalentine.hearts.TextRectDetails;
 import com.example.heartsvalentine.hearts.mainSizes.HeartMainSizes;
 import com.example.heartsvalentine.hearts.shapeDetails.EmojiShapeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.ShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.SymbolShapeDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,29 @@ public class HeartTextBoundaries implements TextBoundaries {
         int[] retVal = new int[2];
         retVal[0] = Math.min(xFirst, xSecond);
         retVal[1] = Math.max(xFirst, xSecond);
+        return retVal;
+    }
+
+    private int[] getXEllipseIntersectionsFromYSymbol(int y, boolean left) {
+        // This version is for symbols - will probably replace getXCircleIntersectionsFromY. Has no quick fix arbitrary correction,
+        // so should be able to increase/decrease symbol size relative to text.
+        // This version has correct circle centres.
+        // width and height refer to width and height of symbol.
+        // centre of left circle is x_centre = margin + radius + width/2.0
+        // 					        y_centre = margin + radius + height/2.0
+        // centre of right circle is x_centre = width - margin - radius - width/2.0
+        // 					         y_centre = margin + radius + height/2.0
+        // equation of an ellipse is (x - Cx)**2/a**2 + (y - Cy)**2/b**2 = 1
+        // so x = Cx +- a*sqrt(1 - (y - Cy)**2/b**2)
+        double Cx = left? (mainSizes.getMargin() + mainSizes.getRadius() +  sd.getWidth()/2.0) : (mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() - sd.getWidth()/2.0);
+        double Cy = (mainSizes.getMargin() + mainSizes.getRadius() +  sd.getHeight()/2.0);
+        double a = mainSizes.getRadius() - sd.getWidth()/2.0 - tfd.getTxtHeartsMargin();
+        double b = mainSizes.getRadius() - sd.getHeight()/2.0 - tfd.getTxtHeartsMargin();
+
+        int[] retVal = new int[2];
+        double otherSide = a*Math.sqrt(1 - Math.pow(y - Cy, 2)/(b*b));
+        retVal[0] = (int)(Cx - otherSide);
+        retVal[1] = (int)(Cx + otherSide);
         return retVal;
     }
 
@@ -110,8 +134,48 @@ public class HeartTextBoundaries implements TextBoundaries {
         return new int[][]{xPoints, yPoints};
     }
 
+    private int[][] computeBottomTrianglePtsSymbols() {
+        Point ptLeftTopCircleCentre = new Point((int)(mainSizes.getMargin() + mainSizes.getRadius() + sd.getWidth()/2.0), (int)(mainSizes.getMargin() + mainSizes.getRadius() + sd.getWidth()/2.0));
+        Point ptRightTopCircleCentre = new Point((int)(mainSizes.getWidth() - mainSizes.getMargin() - mainSizes.getRadius() - sd.getWidth()/2.0), (int)(mainSizes.getMargin() + mainSizes.getRadius() + sd.getWidth()/2.0));
+
+        double startAngle = Math.acos((mainSizes.getWidth()/2.0 - ptLeftTopCircleCentre.x)/mainSizes.getRadius());
+        double vertDistBottomPt = mainSizes.getHeight() - 2 * mainSizes.getMargin() - mainSizes.getRadius(); // y-coordinate top circle centres - y coordinate of bottom of heart
+        double alpha = Math.atan(vertDistBottomPt/mainSizes.getRadius());
+        double phi = Math.atan(vertDistBottomPt/(mainSizes.getRadius()*Math.cos(startAngle)));
+
+        double beta = 2*Math.PI - alpha - phi;
+
+        double pt1x = ptLeftTopCircleCentre.x + mainSizes.getRadius() * Math.cos(beta)  - tfd.getTxtHeartsMargin() / Math.sin(beta)/*- heartCenterX + heartCenterWidth*/;
+        double pt1y = ptLeftTopCircleCentre.y - mainSizes.getRadius() * Math.sin(beta) + sd.getHeight();
+
+        double pt2x = ptRightTopCircleCentre.x + mainSizes.getRadius() * Math.cos(Math.PI - beta) + tfd.getTxtHeartsMargin() / Math.sin(beta)/*- heartCenterX + heartCenterWidth*/;
+        double pt2y = ptRightTopCircleCentre.y - mainSizes.getRadius() * Math.sin(Math.PI - beta) + sd.getHeight();
+
+        double pt3x = mainSizes.getWidth()/2.0;
+        double pt3y = mainSizes.getHeight() - mainSizes.getMargin() + tfd.getTxtHeartsMargin() / Math.cos(Math.PI/2.0 - beta);
+
+        double zeta = Math.atan ( (pt1y - pt3y)/(pt1x - pt3x));
+        double heightAdjustment = -0.5 * sd.getWidth() * Math.sin(zeta) - sd.getHeight();
+
+        pt1y += heightAdjustment;
+        pt2y += heightAdjustment;
+        pt3y += heightAdjustment;
+
+        int[] xPoints = {(int)pt1x, (int)pt3x, (int)pt2x};
+        int[] yPoints = {(int)pt1y, (int)pt3y, (int)pt2y};
+
+        return new int[][]{xPoints, yPoints};
+    }
+
     public List<TextRectDetails> computeTextRectangles() {
-        int[][] pts = computeBottomTrianglePts();
+        int[][] pts;
+
+        if (sd instanceof SymbolShapeDetails) {
+            pts = computeBottomTrianglePtsSymbols();
+        }
+        else {
+            pts = computeBottomTrianglePts();
+        }
 
         // Uncomment line below for testing purposes
         // drawShapes(pts);
@@ -119,7 +183,6 @@ public class HeartTextBoundaries implements TextBoundaries {
         int yTop = (int)(tfd.getTopTextMargin() + mainSizes.getMargin() + 2*sd.getHeight());
 
         if (sd instanceof EmojiShapeDetails) {
-            // if (hd.getUseEmoji()) {
             while (yTop < pts[1][0]) {
                 int[] xTopLeft = getXCircleIntersectionsFromY(yTop, true);
                 int[] xTopRight = getXCircleIntersectionsFromY(yTop, false);
@@ -127,6 +190,38 @@ public class HeartTextBoundaries implements TextBoundaries {
                 int yBottom = yTop + (int) textAscent;
                 int[] xBottomLeft = getXCircleIntersectionsFromY(yBottom, true);
                 int[] xBottomRight = getXCircleIntersectionsFromY(yBottom, false);
+
+                int xLeftLeftCircle = Math.max(xTopLeft[0], xBottomLeft[0]);
+                int xRightLeftCircle = Math.min(xTopLeft[1], xBottomLeft[1]);
+
+                int xLeftRightCircle = Math.max(xTopRight[0], xBottomRight[0]);
+                int xRightRightCircle = Math.min(xTopRight[1], xBottomRight[1]);
+
+                // The 2 rectangles can be very close, without intersecting and without these intersecting heart if these were joined. When this happens, funny result with hyphen added in middle of line.
+                // see INPUT_PATH_SILLY_MESSAGE with text to heart margin of 20
+                // To remedy this, let us also merge if gap is very small - say half of heart width.
+                // Hope not introducing bug here.
+                int maxGap = (int) (sd.getWidth() / 2.0);
+
+                if (xRightLeftCircle + maxGap < xLeftRightCircle && yTop < (mainSizes.getMargin() - sd.getCenterY() + mainSizes.getRadius()) && yBottom < (mainSizes.getMargin() - sd.getCenterY() + mainSizes.getRadius())) {
+                    rectLst.add(new TextRectDetails(new Rect(xLeftLeftCircle, yTop, xRightLeftCircle, yBottom)));
+                    rectLst.add(new TextRectDetails(new Rect(xLeftRightCircle, yTop, xRightRightCircle, yBottom)));
+                } else {
+                    rectLst.add(new TextRectDetails(new Rect(xLeftLeftCircle, yTop, xRightRightCircle, yBottom)));
+                }
+                yTop += tfd.getLineHeight();
+            }
+        }
+        else if (sd instanceof SymbolShapeDetails) {
+            yTop = (int)(tfd.getTopTextMargin() + mainSizes.getMargin() + sd.getHeight() - textAscent);
+
+            while (yTop < pts[1][0]) {
+                int[] xTopLeft = getXEllipseIntersectionsFromYSymbol(yTop, true);
+                int[] xTopRight = getXEllipseIntersectionsFromYSymbol(yTop, false);
+
+                int yBottom = yTop + (int) textAscent;
+                int[] xBottomLeft = getXEllipseIntersectionsFromYSymbol(yBottom, true);
+                int[] xBottomRight = getXEllipseIntersectionsFromYSymbol(yBottom, false);
 
                 int xLeftLeftCircle = Math.max(xTopLeft[0], xBottomLeft[0]);
                 int xRightLeftCircle = Math.min(xTopLeft[1], xBottomLeft[1]);
@@ -200,9 +295,6 @@ public class HeartTextBoundaries implements TextBoundaries {
             rectLst.add(new TextRectDetails(new Rect(x1, yTop, x2, yBottom)));
             yTop += tfd.getLineHeight();
         }
-
-        // Uncomment for testing purpose
-        // drawTextBoundingRectangles();
         return rectLst;
     }
 }
