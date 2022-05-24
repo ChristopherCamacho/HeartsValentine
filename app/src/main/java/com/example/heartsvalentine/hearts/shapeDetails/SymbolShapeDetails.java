@@ -1,7 +1,6 @@
 package com.example.heartsvalentine.hearts.shapeDetails;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -77,7 +76,7 @@ public class SymbolShapeDetails implements ShapeDetails {
 
     @Override
     public float getBottomAdjustment() {
-        return 0;
+        return  -height/2.0f - centerY;
     }
 
     @Override
