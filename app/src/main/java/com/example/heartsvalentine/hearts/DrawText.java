@@ -636,7 +636,7 @@ final class DrawText {
 		int previousRectWidth;
 		float lastWordSegmentWidth = 0;
 
-		if (tfd.getHyphenateText()) {
+		if (tfd.getHyphenateText() && lastWord != null) {
 			String[] brokenWords = hyphenator.hyphernateWord(lastWord);
 			String lastWordSegment = "-" + brokenWords[brokenWords.length - 1];
 			//lastWordSegmentWidth = g2d.getFontMetrics().charsWidth(lastWordSegment.toCharArray(), 0, lastWordSegment.length());
