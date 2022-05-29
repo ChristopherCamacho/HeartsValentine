@@ -91,6 +91,7 @@
                 </FrameLayout>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/symbolLinearLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -140,6 +141,7 @@
                 </FrameLayout>
             </LinearLayout>
            <LinearLayout
+               android:id="@+id/symbolColourLinearLayout"
                android:layout_width="fill_parent"
                android:layout_height="wrap_content"
                android:orientation="horizontal">
@@ -188,6 +190,7 @@
                </FrameLayout>
            </LinearLayout>
             <LinearLayout
+                android:id="@+id/mainShapeLinearLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -236,6 +239,15 @@
                         android:background="@color/white"/>
                 </FrameLayout>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/noPurchaseMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_purchase"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="13dp"
+                android:textColor="@color/black"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

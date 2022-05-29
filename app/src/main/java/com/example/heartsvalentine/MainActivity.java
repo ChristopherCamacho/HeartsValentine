@@ -12,6 +12,7 @@ import com.example.heartsvalentine.viewModels.HeartsValBitmapViewModel;
 import com.example.heartsvalentine.viewModels.HplFileNameMapViewModel;
 import com.example.heartsvalentine.viewModels.HyphenDetailsListViewModel;
 import com.example.heartsvalentine.viewModels.HyphenFilesListViewModel;
+import com.example.heartsvalentine.viewModels.MainActivityViewModel;
 import com.example.heartsvalentine.viewModels.TabLayoutViewModel;
 import com.example.heartsvalentine.viewModels.TextInputViewModel;
 import com.example.heartsvalentine.viewModels.UserFilesViewModel;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     HashMap<String, String> hplFileNameMap = new HashMap<>();
     HashMap<String, String> fileNameHplMap = new HashMap<>();
     HeartValParameters hvp = new HeartValParameters();
+    private MainActivityViewModel mainActivityViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
             loadSavedSettings();
+
+            // Billing here
+            MainActivityViewModel.MainActivityViewModelFactory mainActivityViewModelFactory = new
+                    MainActivityViewModel.MainActivityViewModelFactory(
+                    ((HeartsValentineApplication)getApplication()).getAppContainer().
+                            getNewFeaturesRepository());
+            mainActivityViewModel = new ViewModelProvider(this, mainActivityViewModelFactory)
+                    .get(MainActivityViewModel.class);
+            mainActivityViewModel.correctHeartValParams(hvp);
+            // Allows billing to refresh purchases during onResume
+            getLifecycle().addObserver(mainActivityViewModel.getBillingLifecycleObserver());
         } catch (JSONException | IOException e) {
             e.printStackTrace();
         }

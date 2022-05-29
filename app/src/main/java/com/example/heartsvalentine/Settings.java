@@ -179,6 +179,8 @@ public class Settings extends Fragment {
         useEmojiSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {hvp.setUseEmoji(isChecked);
             activateDeactivateHeartColorButton(view, !isChecked);});
         */
+        final View buttonNavToNewFeatureSetting = view.findViewById(R.id.newFeatures);
+        buttonNavToNewFeatureSetting.setOnClickListener(v -> navigateToNewFeaturesFragment());
 
         final View saveSettingsButton = view.findViewById(R.id.saveSettings);
         saveSettingsButton.setOnClickListener(v -> saveSettings());
@@ -200,6 +202,17 @@ public class Settings extends Fragment {
 
     void navigateToFrameShapeSettingsFragment() {
         Fragment fragment = new FrameShapes();
+
+        FragmentManager fragmentManager =  fragmentActivityContext.getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.settings_frame, fragment)
+                .setReorderingAllowed(true)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    void navigateToNewFeaturesFragment() {
+        Fragment fragment = new NewFeatures();
 
         FragmentManager fragmentManager =  fragmentActivityContext.getSupportFragmentManager();
         fragmentManager.beginTransaction()
