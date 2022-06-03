@@ -20,7 +20,7 @@
     <string name="margin">Margin</string>
     <string name="enter_number_between_0_500">Number between 0&#8211;500</string>
     <string name="use_emoji">Use emoji</string>
-    <string name="shape_color">Shape color</string>
+    <string name="shape_color">Symbol color</string>
     <string name="background_color">Background color</string>
     <string name="text_color">Text color</string>
     <string name="choose">Choose</string>
@@ -42,11 +42,15 @@
     <string name="image_description">Hearts Valentine Image</string>
     <string name="frame_shape_settings">Frame shape settings &#62;</string>
     <string name="emoji">Emoji</string>
-    <string name="edge_shape">Edge shape</string>
+    <string name="edge_shape">Symbol</string>
     <string name="main_shape">Main shape</string>
     <string name="select_emoji">Select an emoji</string>
     <string name="select_symbol">Select a symbol</string>
     <string name="select_main_shape">Select a main shape</string>
     <string name="new_features">New features &#62;</string>
     <string name="no_purchase">You have not purchased any New features yet. To do this, press \u0022&#60; Back\u0022, scroll down if necessary and select \u0022New features &#62;\u0022.</string>
+    <string name="new_features_ellipsis">New features...</string>
+    <string name="info">Info...</string>
+    <string name="buy">Buy!</string>
+    <string name="already_purchased">(Purchased)</string>
 </resources>

@@ -83,13 +83,17 @@ class NewFeaturesRepository (
         return storeManager.getSkuDescription(sku)
     }
 
+    fun getSKUArray(): Array<String> {
+        return INAPP_SKUS
+    }
+
     val billingFlowInProcess: Flow<Boolean>
         get() = storeManager.getBillingFlowInProcess()
 
     companion object {
         const val SKU_EMOJI = "com.hearts_valentine.emojis"
-        const val SKU_MAINFRAME_SHAPES = "com.hearts_valentine.mainframeShapes"
-        const val SKU_SYMBOLS_AND_COLOURS = "com.hearts_valentine.symbolsAndColours"
+        const val SKU_MAINFRAME_SHAPES = "com.hearts_valentine.mainframe_shapes"
+        const val SKU_SYMBOLS_AND_COLOURS = "com.hearts_valentine.symbols_and_colours"
 
         val TAG = NewFeaturesRepository::class.simpleName
         val INAPP_SKUS = arrayOf(SKU_EMOJI, SKU_MAINFRAME_SHAPES, SKU_SYMBOLS_AND_COLOURS)
