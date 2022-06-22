@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -21,8 +20,9 @@ import com.example.heartsvalentine.viewModels.NewFeaturesViewModel
  */
 class NewFeatures : Fragment() {
     private var fragmentActivityContext: FragmentActivity? = null
-    private var sKUDetailsList: ListView? = null
     private var newFeaturesViewModel: NewFeaturesViewModel? = null
+    private var newFeatureListAdapter: NewFeatureListAdapter? = null
+
     private var binding: FragmentNewFeaturesBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,13 +39,16 @@ class NewFeatures : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentNewFeaturesBinding.inflate(layoutInflater)
         container?.removeAllViews()
         val view = binding!!.root
 
         val button = view.findViewById<View>(R.id.backButton)
-        button.setOnClickListener { navigateToSettingsFragment() }
+        button.setOnClickListener {
+            navigateToSettingsFragment()
+            newFeatureListAdapter?.closeInfoPopup()
+        }
 
         return view
     }
@@ -56,30 +59,27 @@ class NewFeatures : Fragment() {
 
         val newFeaturesViewModelFactory: NewFeaturesViewModel.NewFeaturesViewModelFactory =
         NewFeaturesViewModel.NewFeaturesViewModelFactory(
-            (requireActivity().application as HeartsValentineApplication).appContainer.newFeaturesRepository
+            (requireActivity().application as HeartsValentineApplication).appContainer.storeManager
             )
-        newFeaturesViewModel = ViewModelProvider(this, newFeaturesViewModelFactory)
-            .get(NewFeaturesViewModel::class.java)
+        ViewModelProvider(this, newFeaturesViewModelFactory)[NewFeaturesViewModel::class.java].also { newFeaturesViewModel = it }
 
         binding?.nfvm = newFeaturesViewModel
-        binding!!.inappInventory.setLayoutManager(LinearLayoutManager(context))
+        binding!!.inAppInventory.layoutManager = LinearLayoutManager(context)
 
         val app = activity
 
         if (app != null){
-            val nfr =
-                (app.application as HeartsValentineApplication).appContainer.newFeaturesRepository
-            val skuArrayList = nfr.getSKUArray().toCollection(ArrayList())
+            val storeManager =
+                (app.application as HeartsValentineApplication).appContainer.storeManager
 
-            binding!!.inappInventory.setAdapter(
-                NewFeatureListAdapter(
-                    requireContext(),
-                    skuArrayList,
-                    newFeaturesViewModel!!,
-                    this,
-                    nfr,
-                    app
-                ))
+            newFeatureListAdapter = NewFeatureListAdapter(
+                requireContext(),
+                newFeaturesViewModel!!,
+                this,
+                storeManager,
+                app
+            )
+            binding!!.inAppInventory.adapter = newFeatureListAdapter
         }
     }
 
@@ -94,13 +94,6 @@ class NewFeatures : Fragment() {
                 .setReorderingAllowed(true)
                 .commit()
         }
-    }
-
-    fun showInfoPopUp(skuDetails: NewFeaturesViewModel.SkuDetails) {
-    }
-
-    fun makePurchase(sku: String) {
-        activity?.let { newFeaturesViewModel?.buySku(it, sku) }
     }
 
     companion object {

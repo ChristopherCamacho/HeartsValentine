@@ -15,7 +15,6 @@
  *
  *  * Modified by Hogsmill Software Ltd, May 2022 renamed StoreManager from BillingDataSource
  */
-
 package com.example.heartsvalentine.billing
 
 import android.app.Activity
@@ -24,7 +23,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
-import androidx.lifecycle.LifecycleObserver
 import com.android.billingclient.api.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -39,25 +37,17 @@ class StoreManager private constructor(
     application: Application,
     private val defaultScope: CoroutineScope,
     knownInAppSKUs: Array<String>?) :
-    LifecycleObserver, PurchasesUpdatedListener, BillingClientStateListener {
-    // Billing client, connection, cached data
+    PurchasesUpdatedListener, BillingClientStateListener {
+
     private val billingClient: BillingClient
-    // known SKUs (used to query sku data and validate responses)
-    private val knownInappSKUs: List<String>?
-    // how long before the data source tries to reconnect to Google play
+    val knownInappSKUs: List<String>?
     private var reconnectMilliseconds = RECONNECT_TIMER_START_MILLISECONDS
-    // when was the last successful SkuDetailsResponse?
     private var skuDetailsResponseTime = -SKU_DETAILS_REQUERY_TIME
     private enum class SkuState {
         SKU_STATE_UNPURCHASED, SKU_STATE_PENDING, SKU_STATE_PURCHASED, SKU_STATE_PURCHASED_AND_ACKNOWLEDGED
     }
-    // Flows that are mostly maintained so they can be transformed into observables.
     private val skuStateMap: MutableMap<String, MutableStateFlow<SkuState>> = HashMap()
     private val skuDetailsMap: MutableMap<String, MutableStateFlow<SkuDetails?>> = HashMap()
-
-    // Observables that are used to communicate state.
-    private val newPurchaseFlow = MutableSharedFlow<List<String>>(extraBufferCapacity = 1)
-    private val billingFlowInProcess = MutableStateFlow(false)
 
     companion object {
         private val TAG = "TrivialDrive:" + StoreManager::class.java.simpleName
@@ -81,7 +71,6 @@ class StoreManager private constructor(
                 .also { sInstance = it }
         }
     }
-
 
     init {
         this.knownInappSKUs = if (knownInAppSKUs == null) {
@@ -108,9 +97,9 @@ class StoreManager private constructor(
             details.subscriptionCount.map { count -> count > 0 } // map count into active/inactive flag
                 .distinctUntilChanged() // only react to true<->false changes
                 .onEach { isActive -> // configure an action
-                    if (isActive && (SystemClock.elapsedRealtime() - skuDetailsResponseTime > SKU_DETAILS_REQUERY_TIME)) {
-                        skuDetailsResponseTime = SystemClock.elapsedRealtime()
-                        Log.v(TAG, "Skus not fresh, re-querying")
+                    if (isActive) {// && (SystemClock.elapsedRealtime() - skuDetailsResponseTime > SKU_DETAILS_REQUERY_TIME)) {
+                      //  skuDetailsResponseTime = SystemClock.elapsedRealtime()
+                        //Log.v(TAG, "Skus not fresh, re-querying")
                         querySkuDetailsAsync()
                     }
                 }
@@ -214,7 +203,6 @@ class StoreManager private constructor(
         }
         defaultScope.launch {
             billingFlowInProcess.emit(false)
-        }
     }
 
     /**
@@ -281,14 +269,14 @@ class StoreManager private constructor(
                                     .build()
                             )
                             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                                Log.e(TAG, "Error acknowledging purchase: ${purchase.skus.toString()}")
+                                Log.e(TAG, "Error acknowledging purchase: ${purchase.skus}")
                             } else {
                                 // purchase acknowledged
                                 for (sku in purchase.skus) {
                                     setSkuState(sku, SkuState.SKU_STATE_PURCHASED_AND_ACKNOWLEDGED)
                                 }
                             }
-                            newPurchaseFlow.tryEmit(purchase.skus)
+                            //newPurchaseFlow.tryEmit(purchase.skus)
                         }
                     }
                 } else {
@@ -347,13 +335,13 @@ class StoreManager private constructor(
             }
         }
     }
-
     /**
      * Since we (mostly) are getting sku states when we actually make a purchase or update
      * purchases, we keep some internal state when we do things like acknowledge or consume.
      * @param sku product ID to change the state of
      * @param newSkuState the new state of the sku.
      */
+    // used by processPurchaseList - might be redundant
     private fun setSkuState(sku: String, newSkuState: SkuState) {
         val skuStateFlow = skuStateMap[sku]
         skuStateFlow?.tryEmit(newSkuState)
@@ -369,6 +357,7 @@ class StoreManager private constructor(
      * self-upgrades or is force closed.
      */
     override fun onBillingServiceDisconnected() {
+        // empty in Monster sample
         retryBillingServiceConnectionWithExponentialBackoff()
     }
 
@@ -396,7 +385,8 @@ class StoreManager private constructor(
                 // The billing client is ready. You can query purchases here.
                 // This doesn't mean that your app is set up correctly in the console -- it just
                 // means that you have a connection to the Billing service.
-                reconnectMilliseconds = RECONNECT_TIMER_START_MILLISECONDS
+            // this line missing in monster sample
+            //    reconnectMilliseconds = RECONNECT_TIMER_START_MILLISECONDS
                 defaultScope.launch {
                     querySkuDetailsAsync()
                     refreshPurchases()
@@ -410,9 +400,9 @@ class StoreManager private constructor(
      GPBLv3 now queries purchases synchronously, simplifying this flow. This only gets active
      purchases.
   */
-    suspend fun refreshPurchases() {
+    private suspend fun refreshPurchases() {
         Log.d(TAG, "Refreshing purchases.")
-        var purchasesResult = billingClient.queryPurchasesAsync(BillingClient.SkuType.INAPP)
+        val purchasesResult = billingClient.queryPurchasesAsync(BillingClient.SkuType.INAPP)
         var billingResult = purchasesResult.billingResult
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             Log.e(TAG, "Problem getting purchases: " + billingResult.debugMessage)
@@ -422,7 +412,7 @@ class StoreManager private constructor(
         Log.d(TAG, "Refreshing purchases finished.")
     }
 
-    fun getNewPurchases() = newPurchaseFlow.asSharedFlow()
+//    fun getNewPurchases() = newPurchaseFlow.asSharedFlow()
 
     /**
      * Launch the billing flow. This will launch an external Activity for a result, so it requires
@@ -439,14 +429,14 @@ class StoreManager private constructor(
         if (null != skuDetails) {
             val billingFlowParamsBuilder = BillingFlowParams.newBuilder()
             billingFlowParamsBuilder.setSkuDetails(skuDetails)
-            val upgradeSkus = arrayOf(*upgradeSkusVarargs)
+            //val upgradeSkus = arrayOf(*upgradeSkusVarargs)
             defaultScope.launch {
                 val br = billingClient.launchBillingFlow(
                     activity!!,
                     billingFlowParamsBuilder.build()
                 )
                 if (br.responseCode == BillingClient.BillingResponseCode.OK) {
-                    billingFlowInProcess.emit(true)
+                    //billingFlowInProcess.emit(true)
                 } else {
                     Log.e(TAG, "Billing failed: + " + br.debugMessage)
                 }
@@ -454,6 +444,19 @@ class StoreManager private constructor(
         } else {
             Log.e(TAG, "SkuDetails not found for: $sku")
         }
+    }
+
+    // define launchBillingFlow which will open the window at the bottom to purchase
+    //  the product
+    fun launchBillingFlow(activity: Activity, sku: String) {
+        val skuDetails = skuDetailsMap[sku]?.value
+        if (null != skuDetails) {
+            val flowParams = BillingFlowParams.newBuilder()
+                .setSkuDetails(skuDetails)
+                .build()
+            billingClient.launchBillingFlow(activity, flowParams)
+        }
+        Log.e(TAG, "SkuDetails not found for: $sku")
     }
 
     /**
@@ -508,17 +511,4 @@ class StoreManager private constructor(
             skuDetails?.description
         }
     }
-
-    /**
-     * Returns a Flow that reports if a billing flow is in process, meaning that
-     * launchBillingFlow has returned BillingResponseCode.OK and onPurchasesUpdated hasn't yet
-     * been called.
-     * @return Flow that indicates the known state of the billing flow.
-     */
-    fun getBillingFlowInProcess(): Flow<Boolean> {
-        return billingFlowInProcess.asStateFlow()
-    }
-
-
-
 }

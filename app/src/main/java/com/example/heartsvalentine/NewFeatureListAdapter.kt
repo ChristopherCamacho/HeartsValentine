@@ -1,58 +1,85 @@
 package com.example.heartsvalentine
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Typeface
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.heartsvalentine.billing.NewFeaturesRepository
+import com.example.heartsvalentine.billing.SKU_EMOJI
+import com.example.heartsvalentine.billing.SKU_MAINFRAME_SHAPES
+import com.example.heartsvalentine.billing.SKU_SYMBOLS_AND_COLOURS
+import com.example.heartsvalentine.billing.StoreManager
 import com.example.heartsvalentine.databinding.ListNewFeatureItemsBinding
 import com.example.heartsvalentine.viewModels.NewFeaturesViewModel
 
 class NewFeatureListAdapter internal constructor(
     context: Context,
-    sKUList: ArrayList<String>?,
     newFeaturesViewModel: NewFeaturesViewModel,
     newFeaturesFragment: NewFeatures,
-    nfr: NewFeaturesRepository,
+    storeManager: StoreManager,
     activity: Activity
 ) :
     RecyclerView.Adapter<NewFeatureListAdapter.ViewHolder>() {
-    var newFeaturesInflater: LayoutInflater
-    var sKUList: ArrayList<String>?
+    private var newFeaturesInflater: LayoutInflater
     var context: Context
-    val newFeaturesViewModel: NewFeaturesViewModel
-    val newFeaturesFragment: NewFeatures
-    var nfr: NewFeaturesRepository
-    var activity: Activity
+    private val newFeaturesViewModel: NewFeaturesViewModel
+    private val newFeaturesFragment: NewFeatures
+    private var storeManager: StoreManager
+    private var sKUList: ArrayList<String>?
+    private var activity: Activity
+    private var closePopupBtn: Button? = null
+    private var popupWindow: PopupWindow? = null
+    private var linearLayoutNewFeatures: LinearLayout? = null
+    private var infoPopupOpen: Boolean = false
 
     inner class ViewHolder(private val binding: ListNewFeatureItemsBinding)
         : RecyclerView.ViewHolder(binding.root) {
+        var infoButton: AppCompatButton = binding.root.rootView.findViewById<View>(R.id.infoButton) as AppCompatButton
+        var buyPurchasedButton: AppCompatButton = binding.root.rootView.findViewById<View>(R.id.buyPurchasedButton) as AppCompatButton
+
         fun bind(
             item: String,
             newFeaturesViewModel: NewFeaturesViewModel,
             newFeaturesFragment: NewFeatures
         ) {
-
-            val str: String? = newFeaturesViewModel.getSkuDetails(item).title.value
-            binding.featureName.setText(str)
-
-            // What about can purchase? Consider this in code
-            if (newFeaturesViewModel.isPurchased(item).value == true) {
-                setButtonToPurchasedStatus(binding.buyPurchasedButton)
+            val infoTitle: Int = when (item) {
+                SKU_EMOJI -> R.string.title_emojis
+                SKU_MAINFRAME_SHAPES -> R.string.title_main_shapes
+                SKU_SYMBOLS_AND_COLOURS -> R.string.title_symbols_and_colours
+                else -> 0
             }
-            else if (newFeaturesViewModel.canBuySku(item).value == true) {
-                setButtonToBuyStatus(binding.buyPurchasedButton)
-            }
-            else {
-                setButtonToUnknownStatus(binding.buyPurchasedButton)
+            binding.featureName.text = context.resources.getString(infoTitle)
+
+            newFeaturesViewModel.getSkuDetails(item).title.observe(newFeaturesFragment.viewLifecycleOwner) {
+                binding.featureName.apply {
+                    text = it
+                }
             }
 
-            binding.setLifecycleOwner(newFeaturesFragment)
+            newFeaturesViewModel.isPurchased(item).observe(newFeaturesFragment.viewLifecycleOwner
+            ) { isPurchased ->
+                if (isPurchased) {
+                    setButtonToPurchasedStatus(binding.buyPurchasedButton)
+                } else {
+                    newFeaturesViewModel.canBuySku(item)
+                        .observe(newFeaturesFragment.viewLifecycleOwner
+                        ) {
+                            canPurchase ->
+                            if (canPurchase) {
+                                setButtonToBuyStatus(binding.buyPurchasedButton)
+                            } else {
+                                setButtonToUnknownStatus(binding.buyPurchasedButton)
+                            }
+                        }
+                }
+            }
+
+            binding.lifecycleOwner = newFeaturesFragment
             binding.executePendingBindings()
         }
     }
@@ -67,36 +94,112 @@ class NewFeatureListAdapter internal constructor(
         holder: NewFeatureListAdapter.ViewHolder,
         position: Int
     ) {
-        sKUList?.let { holder.bind( it.get(position), this.newFeaturesViewModel, newFeaturesFragment) }
+        sKUList?.let { holder.bind(it[position], this.newFeaturesViewModel, newFeaturesFragment) }
+
+        holder.infoButton.setOnClickListener {
+            showInfo(position)
+        }
+
+        holder.buyPurchasedButton.setOnClickListener {
+            buySKU(position)
+        }
     }
 
     override fun getItemCount(): Int {
         return if (sKUList != null) sKUList!!.size else 0
     }
 
-    fun showInfo(i: Int) {
+    private fun showInfo(position: Int) {
+        if (!infoPopupOpen) {
+            infoPopupOpen = true
+
+            val sku = sKUList?.get(position)
+            val layoutInflater =
+                activity.getSystemService(AppCompatActivity.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val customView = layoutInflater.inflate(R.layout.info_pop_up, newFeaturesFragment.view as ViewGroup, false)
+
+            // Display description here
+            val description = customView.findViewById<TextView>(R.id.infoDescription)
+            val infoDescription: Int = when (sku) {
+                SKU_EMOJI -> R.string.description_emojis
+                SKU_MAINFRAME_SHAPES -> R.string.description_main_shapes
+                SKU_SYMBOLS_AND_COLOURS -> R.string.description_symbols_and_colours
+                else -> 0
+            }
+            if (sku != null) {
+                description.text = context.resources.getString(infoDescription)
+
+                // Hard coded so get a description string even if billing server not connected.
+                // Getting from billing server gives dreadful layout anyway, so commented code below:
+                /*newFeaturesViewModel.getSkuDetails(sku).description?.observe(newFeaturesFragment.viewLifecycleOwner,
+                    {
+                        description.text = it
+                    })*/
+            }
+
+            // Display image
+            val img = customView.findViewById<ImageView>(R.id.infoInAppImage)
+            NewFeaturesViewModel.sKUToResourceIdMap[sku]?.let { it1 -> img.setImageResource(it1) }
+
+            // Display price here
+            if (sku != null) {
+                newFeaturesViewModel.getSkuDetails(sku).price.observe(newFeaturesFragment.viewLifecycleOwner) {
+                    val price = customView.findViewById<TextView>(R.id.infoPrice)
+                    price.text = context.resources.getString(R.string.price, it)
+                }
+            }
+            // Show popup
+            popupWindow = PopupWindow(
+                customView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            linearLayoutNewFeatures =
+                newFeaturesFragment.view?.findViewById<View>(R.id.linearLayoutNewFeatures) as LinearLayout
+            popupWindow!!.showAtLocation(linearLayoutNewFeatures, Gravity.CENTER, 0, 0)
+            // Handle close button
+            closePopupBtn = customView.findViewById<View>(R.id.closePopupBtn) as Button
+            closePopupBtn!!.setOnClickListener {
+                popupWindow!!.dismiss()
+                infoPopupOpen = false
+            }
+        }
     }
 
-    fun buySKU(i: Int, purchasedEmoji: Boolean) {
-        if (purchasedEmoji) {
-            // pop up already bought
-        } else {
-            nfr.buySku(activity, sKUList!![i])
-            //   nfr.re.refreshPurchases();
+    private fun buySKU(position: Int) {
+        var isPurchased: Boolean
+        val sku = sKUList?.get(position)
+        if (sku != null) {
+            newFeaturesViewModel.isPurchased(sku).observe(newFeaturesFragment.viewLifecycleOwner) {
+                isPurchased = it
+                if (isPurchased) {
+                    // Show popup already purchased
+                    AlertDialog.Builder(context)
+                        .setTitle(context.resources.getString(R.string.already_purchased_))
+                        .setMessage(context.resources.getString(R.string.already_purchased_))
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .setIcon(android.R.drawable.alert_light_frame)
+                        .show()
+                }
+                else {
+                    storeManager.launchBillingFlow(activity, sku)
+                }
+            }
         }
     }
 
     fun setButtonToBuyStatus(buyPurchasedButton: AppCompatButton) {
         buyPurchasedButton.visibility = View.VISIBLE
         buyPurchasedButton.setBackgroundColor(ContextCompat.getColor(context, R.color.pinkMagenta))
-        buyPurchasedButton.setText(context.getResources().getString(R.string.buy))
+        buyPurchasedButton.text = context.resources.getString(R.string.buy)
         buyPurchasedButton.setTypeface(null, Typeface.NORMAL)
     }
 
     fun setButtonToPurchasedStatus(buyPurchasedButton: AppCompatButton) {
         buyPurchasedButton.visibility = View.VISIBLE
         buyPurchasedButton.setBackgroundColor(ContextCompat.getColor(context, R.color.navyBlue))
-        buyPurchasedButton.setText(context.getResources().getString(R.string.already_purchased))
+        buyPurchasedButton.text = context.resources.getString(R.string.already_purchased)
         buyPurchasedButton.setTypeface(null, Typeface.ITALIC)
     }
 
@@ -104,13 +207,20 @@ class NewFeatureListAdapter internal constructor(
         buyPurchasedButton.visibility = View.GONE
     }
 
+    fun closeInfoPopup() {
+        if (infoPopupOpen) {
+            popupWindow!!.dismiss()
+            infoPopupOpen = false
+        }
+    }
+
     init {
         newFeaturesInflater = LayoutInflater.from(context)
         this.context = context
-        this.sKUList = sKUList
         this.newFeaturesViewModel = newFeaturesViewModel
         this.newFeaturesFragment = newFeaturesFragment
-        this.nfr = nfr
+        this.storeManager = storeManager
+        this.sKUList = storeManager.knownInappSKUs?.toCollection(ArrayList())
         this.activity = activity
     }
 }

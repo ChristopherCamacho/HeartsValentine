@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
@@ -12,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:id="@+id/linearLayoutNewFeatures"
         tools:context=".NewFeatures">
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/backButton"
@@ -32,13 +32,13 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="9dp"
             android:layout_marginBottom="3dp"
+            android:textStyle="bold|italic"
             android:textColor="@color/black"/>
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/inapp_inventory"
+            android:id="@+id/inApp_inventory"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:enabled="@{!nfvm.billingFlowInProcess}"
             tools:listitem="@layout/list_new_feature_items" />
-    </LinearLayout>`
+    </LinearLayout>
 </layout>
 

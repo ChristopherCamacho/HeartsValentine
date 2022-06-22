@@ -18,28 +18,27 @@
 
 package com.example.heartsvalentine
 import android.app.Application
+import com.example.heartsvalentine.billing.SKU_EMOJI
+import com.example.heartsvalentine.billing.SKU_MAINFRAME_SHAPES
+import com.example.heartsvalentine.billing.SKU_SYMBOLS_AND_COLOURS
 import kotlinx.coroutines.GlobalScope
-import com.example.heartsvalentine.billing.NewFeaturesRepository
 import com.example.heartsvalentine.billing.StoreManager
+import kotlinx.coroutines.DelicateCoroutinesApi
 
+@DelicateCoroutinesApi
 class HeartsValentineApplication : Application() {
     lateinit var appContainer: AppContainer
-    // Container of objects shared across the whole app
     inner class AppContainer {
-        private val applicationScope = GlobalScope
-        private val billingDataSource = StoreManager.getInstance(
-            this@HeartsValentineApplication,
-            applicationScope,
-            NewFeaturesRepository.INAPP_SKUS
-        )
-        val newFeaturesRepository = NewFeaturesRepository(
-            billingDataSource,
-            applicationScope
-        )
-    }
+           private val applicationScope = GlobalScope
+           val storeManager = StoreManager.getInstance(
+               this@HeartsValentineApplication,
+               applicationScope,
+               arrayOf(SKU_EMOJI, SKU_MAINFRAME_SHAPES, SKU_SYMBOLS_AND_COLOURS)
+           )
+       }
 
-    override fun onCreate() {
-        super.onCreate()
-        appContainer = AppContainer()
+       override fun onCreate() {
+           super.onCreate()
+           appContainer = AppContainer()
+       }
     }
-}

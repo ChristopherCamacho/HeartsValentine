@@ -16,13 +16,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import com.example.heartsvalentine.*
-import com.example.heartsvalentine.billing.NewFeaturesRepository
+import com.example.heartsvalentine.billing.SKU_EMOJI
+import com.example.heartsvalentine.billing.SKU_MAINFRAME_SHAPES
+import com.example.heartsvalentine.billing.SKU_SYMBOLS_AND_COLOURS
 import com.example.heartsvalentine.viewModels.HeartValParametersViewModel
+import com.example.heartsvalentine.viewModels.NewFeaturesViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import top.defaults.colorpicker.ColorPickerPopup
 import top.defaults.colorpicker.ColorPickerPopup.ColorPickerObserver
 
+@OptIn(DelicateCoroutinesApi::class)
 class FrameShapes : Fragment() {
     private var fragmentActivityContext: FragmentActivity? = null
     var hvp: HeartValParameters? = null
@@ -34,6 +38,7 @@ class FrameShapes : Fragment() {
     private var mainShapePopupPt: Point? = null
     private var popUpPointsInitialized = false
     private var useEmojiSwitch = false
+    private var newFeaturesViewModel: NewFeaturesViewModel? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,30 +50,22 @@ class FrameShapes : Fragment() {
             HeartValParametersViewModel::class.java
         )
         hvp = heartValParametersViewModel.selectedItem.value
-        var purchasedEmoji = false
-        var purchasedSymbolsAndColours = false
-        var purchasedMainFrameShapes = false
-
-        val act = activity
-
-        if (act != null) {
-            val nfr = (act.application as HeartsValentineApplication).appContainer.newFeaturesRepository
-            val skuEmoji = nfr.isPurchased(NewFeaturesRepository.SKU_EMOJI).asLiveData()
-            purchasedEmoji = skuEmoji.value == true
-            val skuSymbolsAndColours = nfr.isPurchased(NewFeaturesRepository.SKU_SYMBOLS_AND_COLOURS).asLiveData()
-            purchasedSymbolsAndColours = skuSymbolsAndColours.value == true
-            val skuMainFrameShapes = nfr.isPurchased(NewFeaturesRepository.SKU_MAINFRAME_SHAPES).asLiveData()
-            purchasedMainFrameShapes = skuMainFrameShapes.value == true
-        }
+        
+        val newFeaturesViewModelFactory: NewFeaturesViewModel.NewFeaturesViewModelFactory =
+            NewFeaturesViewModel.NewFeaturesViewModelFactory(
+                (requireActivity().application as HeartsValentineApplication).appContainer.storeManager
+            )
+        newFeaturesViewModel = ViewModelProvider(this, newFeaturesViewModelFactory)
+            .get(NewFeaturesViewModel::class.java)
 
         val heartsColorButton = view.findViewById<AppCompatButton>(R.id.heartsColorButton)
         heartsColorButton.setBackgroundColor(hvp!!.heartsColor)
         heartsColorButton.setOnClickListener { v: View? ->
             onClickHeartsColorButton(
                 v,
-                heartsColorButton
-            )
+                heartsColorButton)
         }
+
         emojiButton = view.findViewById(R.id.emojiButton)
         emojiButton?.emoji = hvp!!.emoji
         emojiButton?.setOnClickListener { _: View? -> openEmojiPopup() }
@@ -81,40 +78,55 @@ class FrameShapes : Fragment() {
         filledShapeButton?.setOnClickListener { _: View? -> openShapePopup() }
         activateDeactivateHeartColorButton(view, !hvp!!.useEmoji)
         val useEmojiSwitch = view.findViewById<SwitchCompat>(R.id.useEmojiSwitch)
-        // Hide emoji switch if emojis not purchased
-        useEmojiSwitch.visibility = if (purchasedEmoji) View.VISIBLE else View.GONE
-        useEmojiSwitch.isChecked = hvp!!.useEmoji
-        useEmojiSwitch.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
-            hvp!!.useEmoji = isChecked
-            activateDeactivateHeartColorButton(view, !isChecked)
+
+        val act = activity
+        if (act != null) {
+            newFeaturesViewModel!!.isPurchased(SKU_EMOJI).observe(
+                viewLifecycleOwner
+            ) { purchasedEmojis ->
+                // Hide emoji switch if emojis not purchased
+                useEmojiSwitch.visibility = if (purchasedEmojis) View.VISIBLE else View.GONE
+                useEmojiSwitch.isChecked = hvp!!.useEmoji
+                useEmojiSwitch.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+                    hvp!!.useEmoji = isChecked
+                    activateDeactivateHeartColorButton(view, !isChecked)
+                }
+                // Hide emoji button if emojis not purchased
+                val emojiLineLayout = view.findViewById<LinearLayout>(R.id.emojiLinearLayout)
+                emojiLineLayout.visibility = if (purchasedEmojis) View.VISIBLE else View.GONE
+
+                newFeaturesViewModel!!.isPurchased(SKU_SYMBOLS_AND_COLOURS).observe(this.viewLifecycleOwner
+                ) { purchasedSymbolsAndColours ->
+                    // Hide symbol button if symbols and colours not purchased
+                    val symbolLinearLayout = view.findViewById<LinearLayout>(R.id.symbolLinearLayout)
+                    symbolLinearLayout.visibility =
+                        if (purchasedSymbolsAndColours) View.VISIBLE else View.GONE
+
+                    // Hide symbol colour button if symbols and colours not purchased
+                    val symbolColourLinearLayout =
+                        view.findViewById<LinearLayout>(R.id.symbolColourLinearLayout)
+                    symbolColourLinearLayout.visibility =
+                        if (purchasedSymbolsAndColours) View.VISIBLE else View.GONE
+
+                    newFeaturesViewModel!!.isPurchased(SKU_MAINFRAME_SHAPES).observe(this.viewLifecycleOwner
+                    ) { purchasedMainFrameShapes ->
+                        // Hide symbol colour button if symbols and colours not purchased
+                        val mainShapeLinearLayout = view.findViewById<LinearLayout>(R.id.mainShapeLinearLayout)
+                        mainShapeLinearLayout.visibility =
+                            if (purchasedMainFrameShapes) View.VISIBLE else View.GONE
+                        unfilledShapeButton = view.findViewById(R.id.unfilledShapeButton)
+                        unfilledShapeButton?.setFillShape(false)
+                        unfilledShapeButton?.shapeType = hvp!!.mainShape
+                        unfilledShapeButton?.setOnClickListener { _: View? -> openMainShapePopup() }
+
+                        // If no purchases, show friendly message
+                        val noPurchaseMessage = view.findViewById<TextView>(R.id.noPurchaseMessage)
+                        noPurchaseMessage.visibility =
+                            if (!purchasedEmojis && !purchasedSymbolsAndColours && !purchasedMainFrameShapes) View.VISIBLE else View.GONE
+                    }
+                }
+            }
         }
-
-        // Hide emoji button if emojis not purchased
-        val emojiLineLayout = view.findViewById<LinearLayout>(R.id.emojiLinearLayout)
-        emojiLineLayout.visibility = if (purchasedEmoji) View.VISIBLE else View.GONE
-
-        // Hide symbol button if symbols and colours not purchased
-        val symbolLinearLayout = view.findViewById<LinearLayout>(R.id.symbolLinearLayout)
-        symbolLinearLayout.visibility = if (purchasedSymbolsAndColours) View.VISIBLE else View.GONE
-
-        // Hide symbol colour button if symbols and colours not purchased
-        val symbolColourLinearLayout =
-            view.findViewById<LinearLayout>(R.id.symbolColourLinearLayout)
-        symbolColourLinearLayout.visibility =
-            if (purchasedSymbolsAndColours) View.VISIBLE else View.GONE
-
-        // Hide symbol colour button if symbols and colours not purchased
-        val mainShapeLinearLayout = view.findViewById<LinearLayout>(R.id.mainShapeLinearLayout)
-        mainShapeLinearLayout.visibility = if (purchasedMainFrameShapes) View.VISIBLE else View.GONE
-        unfilledShapeButton = view.findViewById(R.id.unfilledShapeButton)
-        unfilledShapeButton?.setFillShape(false)
-        unfilledShapeButton?.shapeType = hvp!!.mainShape
-        unfilledShapeButton?.setOnClickListener { _: View? -> openMainShapePopup() }
-
-        // If no purchases, show friendly message
-        val noPurchaseMessage = view.findViewById<TextView>(R.id.noPurchaseMessage)
-        noPurchaseMessage.visibility =
-            if (!purchasedEmoji && !purchasedSymbolsAndColours && !purchasedMainFrameShapes) View.VISIBLE else View.GONE
     }
 
     private fun initializePopUpPoints() {
