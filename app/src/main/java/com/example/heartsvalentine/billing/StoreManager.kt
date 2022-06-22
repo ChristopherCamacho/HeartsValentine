@@ -201,8 +201,6 @@ class StoreManager private constructor(
             )
             else -> Log.d(TAG, "BillingResult [" + billingResult.responseCode + "]: " + billingResult.debugMessage)
         }
-        defaultScope.launch {
-            billingFlowInProcess.emit(false)
     }
 
     /**
