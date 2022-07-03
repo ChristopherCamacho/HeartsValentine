@@ -23,7 +23,7 @@ public class ShapeTableCtrl extends View implements View.OnClickListener{
     private int borderThickness;
     private int borderMargin;
     private ShapeCellCtrl selectedShapeCtrl = null;
-    private final Paint paint = new Paint(/*Paint.ANTI_ALIAS_FLAG*/);
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private RectF boundingRect;
     private final ArrayList<ShapeCellCtrl> shapeCellCtrlList = new ArrayList<>();
     private Point popUpSize;
@@ -51,9 +51,7 @@ public class ShapeTableCtrl extends View implements View.OnClickListener{
         shapeCellCtrlList.add(new ShapeCellCtrl(context, ShapeType.Square, false));
         shapeCellCtrlList.add(new ShapeCellCtrl(context, "▲", false));
         shapeCellCtrlList.add(new ShapeCellCtrl(context, ShapeType.Circle, false));
-        shapeCellCtrlList.add(new ShapeCellCtrl(context, "☻", false));
-
-        ShapeType[] suitArray = {ShapeType.Spade, ShapeType.Club, ShapeType.StraightHeart, ShapeType.Diamond, ShapeType.Star}; // star isn't a suit but is next one we want
+        ShapeType[] suitArray = {ShapeType.Smiley, ShapeType.Spade, ShapeType.Club, ShapeType.StraightHeart, ShapeType.Diamond, ShapeType.Star}; // star isn't a suit but is next one we want
 
         for (ShapeType suit : suitArray) {
             ShapeCellCtrl scc = new ShapeCellCtrl(context, suit, false);

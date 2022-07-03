@@ -14,6 +14,7 @@ import com.example.heartsvalentine.hearts.shapeDetails.DrawClubDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawDiamondDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawHeartDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawShapeDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawSmileyDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawSpadeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawSquareDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawStarDetails;
@@ -95,6 +96,10 @@ public class MainShapeCellCtrl extends View {
 
             case Diamond:
                 drawShapeDetails = new DrawDiamondDetails(getContext().getResources().getColor(R.color.black), innerShapeWidth);
+                break;
+
+            case Smiley:
+                drawShapeDetails = new DrawSmileyDetails(getContext().getResources().getColor(R.color.black), innerShapeWidth);
                 break;
 
             default:

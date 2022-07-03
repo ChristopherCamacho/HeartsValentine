@@ -5,6 +5,7 @@ import com.example.heartsvalentine.hearts.shapeDetails.DrawCircleDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawClubDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawDiamondDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawHeartDetails;
+import com.example.heartsvalentine.hearts.shapeDetails.DrawSmileyDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawSpadeDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawSquareDetails;
 import com.example.heartsvalentine.hearts.shapeDetails.DrawStarDetails;
@@ -144,6 +145,8 @@ public class HeartValParameters {
                 return new DrawClubDetails(heartsColor, 92);
             case Diamond:
                 return new DrawDiamondDetails(heartsColor, 92);
+            case Smiley:
+                return new DrawSmileyDetails(heartsColor, 92);
         }
 
         return null;

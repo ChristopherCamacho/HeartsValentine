@@ -16,7 +16,8 @@ public enum ShapeType {
     Lozenge,
     Spade,
     Club,
-    Diamond
+    Diamond,
+    Smiley
 }
 
 
