@@ -10,10 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.heartsvalentine.billing.SKU_EMOJI
-import com.example.heartsvalentine.billing.SKU_MAINFRAME_SHAPES
-import com.example.heartsvalentine.billing.SKU_SYMBOLS_AND_COLOURS
-import com.example.heartsvalentine.billing.StoreManager
+import com.example.heartsvalentine.billing.*
 import com.example.heartsvalentine.databinding.ListNewFeatureItemsBinding
 import com.example.heartsvalentine.viewModels.NewFeaturesViewModel
 
@@ -37,10 +34,12 @@ class NewFeatureListAdapter internal constructor(
     private var linearLayoutNewFeatures: LinearLayout? = null
     private var infoPopupOpen: Boolean = false
 
-    inner class ViewHolder(private val binding: ListNewFeatureItemsBinding)
-        : RecyclerView.ViewHolder(binding.root) {
-        var infoButton: AppCompatButton = binding.root.rootView.findViewById<View>(R.id.infoButton) as AppCompatButton
-        var buyPurchasedButton: AppCompatButton = binding.root.rootView.findViewById<View>(R.id.buyPurchasedButton) as AppCompatButton
+    inner class ViewHolder(private val binding: ListNewFeatureItemsBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        var infoButton: AppCompatButton =
+            binding.root.rootView.findViewById<View>(R.id.infoButton) as AppCompatButton
+        var buyPurchasedButton: AppCompatButton =
+            binding.root.rootView.findViewById<View>(R.id.buyPurchasedButton) as AppCompatButton
 
         fun bind(
             item: String,
@@ -61,21 +60,27 @@ class NewFeatureListAdapter internal constructor(
                 }
             }
 
-            newFeaturesViewModel.isPurchased(item).observe(newFeaturesFragment.viewLifecycleOwner
-            ) { isPurchased ->
-                if (isPurchased) {
-                    setButtonToPurchasedStatus(binding.buyPurchasedButton)
-                } else {
-                    newFeaturesViewModel.canBuySku(item)
-                        .observe(newFeaturesFragment.viewLifecycleOwner
-                        ) {
-                            canPurchase ->
-                            if (canPurchase) {
-                                setButtonToBuyStatus(binding.buyPurchasedButton)
+            newFeaturesViewModel.isPurchased(item).observe(
+                newFeaturesFragment.viewLifecycleOwner
+            ) {
+                newFeaturesViewModel.canBuySku(item)
+                    .observe(
+                        newFeaturesFragment.viewLifecycleOwner
+                    ) { canPurchase ->
+                    if (canPurchase) {
+                        setButtonToBuyStatus(binding.buyPurchasedButton)
+                    } else {
+                        // just purchased....
+                        newFeaturesViewModel.isPurchased(item).observe(
+                            newFeaturesFragment.viewLifecycleOwner
+                        ) { isPurchased ->
+                            if (isPurchased) {
+                                setButtonToPurchasedStatus(binding.buyPurchasedButton)
                             } else {
                                 setButtonToUnknownStatus(binding.buyPurchasedButton)
                             }
                         }
+                    }
                 }
             }
 
@@ -116,7 +121,11 @@ class NewFeatureListAdapter internal constructor(
             val sku = sKUList?.get(position)
             val layoutInflater =
                 activity.getSystemService(AppCompatActivity.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val customView = layoutInflater.inflate(R.layout.info_pop_up, newFeaturesFragment.view as ViewGroup, false)
+            val customView = layoutInflater.inflate(
+                R.layout.info_pop_up,
+                newFeaturesFragment.view as ViewGroup,
+                false
+            )
 
             // Display description here
             val description = customView.findViewById<TextView>(R.id.infoDescription)
@@ -169,8 +178,13 @@ class NewFeatureListAdapter internal constructor(
     private fun buySKU(position: Int) {
         var isPurchased: Boolean
         val sku = sKUList?.get(position)
+        var count = 0
         if (sku != null) {
             newFeaturesViewModel.isPurchased(sku).observe(newFeaturesFragment.viewLifecycleOwner) {
+                if (count > 0) {
+                    return@observe // Don't want this loop executed more than once
+                }
+                count++
                 isPurchased = it
                 if (isPurchased) {
                     // Show popup already purchased
@@ -181,8 +195,7 @@ class NewFeatureListAdapter internal constructor(
                         .setPositiveButton(android.R.string.ok, null)
                         .setIcon(android.R.drawable.alert_light_frame)
                         .show()
-                }
-                else {
+                } else {
                     storeManager.launchBillingFlow(activity, sku)
                 }
             }

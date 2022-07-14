@@ -47,7 +47,7 @@ class StoreManager private constructor(
         SKU_STATE_UNPURCHASED, SKU_STATE_PENDING, SKU_STATE_PURCHASED, SKU_STATE_PURCHASED_AND_ACKNOWLEDGED
     }
     private val skuStateMap: MutableMap<String, MutableStateFlow<SkuState>> = HashMap()
-    private val skuDetailsMap: MutableMap<String, MutableStateFlow<SkuDetails?>> = HashMap()
+    private val productDetailsMap: MutableMap<String, MutableStateFlow<ProductDetails?>> = HashMap()
 
     companion object {
         private val TAG = "TrivialDrive:" + StoreManager::class.java.simpleName
@@ -78,7 +78,7 @@ class StoreManager private constructor(
         } else {
             listOf(*knownInAppSKUs)
         }
-        addSkuFlows(knownInappSKUs)
+        addProductFlows(knownInappSKUs)
         billingClient = BillingClient.newBuilder(application)
             .setListener(this)
             .enablePendingPurchases()
@@ -88,24 +88,25 @@ class StoreManager private constructor(
 
     /**
      * Called by initializeFlows to create the various Flow objects we're planning to emit.
-     * @param skuList a List<String> of SKUs representing purchases and subscriptions.
+ //    * @param skuList a List<String> of SKUs representing purchases and subscriptions.
     </String> */
-    private fun addSkuFlows(skuList: List<String>?) {
-        for (sku in skuList!!) {
+
+    private fun addProductFlows(productList: List<String>?) {
+        for (product in productList!!) {
             val skuState = MutableStateFlow(SkuState.SKU_STATE_UNPURCHASED)
-            val details = MutableStateFlow<SkuDetails?>(null)
+            val details = MutableStateFlow<ProductDetails?>(null)
             details.subscriptionCount.map { count -> count > 0 } // map count into active/inactive flag
                 .distinctUntilChanged() // only react to true<->false changes
                 .onEach { isActive -> // configure an action
                     if (isActive) {// && (SystemClock.elapsedRealtime() - skuDetailsResponseTime > SKU_DETAILS_REQUERY_TIME)) {
-                      //  skuDetailsResponseTime = SystemClock.elapsedRealtime()
+                        //  skuDetailsResponseTime = SystemClock.elapsedRealtime()
                         //Log.v(TAG, "Skus not fresh, re-querying")
-                        querySkuDetailsAsync()
+                        queryProductDetailsAsync()
                     }
                 }
                 .launchIn(defaultScope) // launch it
-            skuStateMap[sku] = skuState
-            skuDetailsMap[sku] = details
+            skuStateMap[product] = skuState
+            productDetailsMap[product] = details
         }
     }
 
@@ -114,16 +115,22 @@ class StoreManager private constructor(
      * SKUs. SKU details are useful for displaying item names and price lists to the user, and are
      * required to make a purchase.
      */
-    private suspend fun querySkuDetailsAsync() {
-        if (!knownInappSKUs.isNullOrEmpty()) {
-            val skuDetailsResult = billingClient.querySkuDetails(
-                SkuDetailsParams.newBuilder()
-                    .setType(BillingClient.SkuType.INAPP)
-                    .setSkusList(knownInappSKUs)
-                    .build()
-            )
-            onSkuDetailsResponse(skuDetailsResult.billingResult, skuDetailsResult.skuDetailsList)
+    private suspend fun queryProductDetailsAsync() {
+        val skuArray = arrayOf(SKU_EMOJI, SKU_MAINFRAME_SHAPES, SKU_SYMBOLS_AND_COLOURS)
+        val productList : MutableList<QueryProductDetailsParams.Product> = ArrayList()
+
+        for (sku in skuArray) {
+            productList.add(
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(sku)
+                    .setProductType(BillingClient.ProductType.INAPP)
+                    .build())
         }
+
+        val params = QueryProductDetailsParams.newBuilder().setProductList(productList)
+        val productDetailsResult = billingClient.queryProductDetails(params.build())
+
+        onProductDetailsResponse(productDetailsResult.billingResult, productDetailsResult.productDetailsList)
     }
 
     /**
@@ -132,13 +139,13 @@ class StoreManager private constructor(
      * Store the SkuDetails and post them in the [.skuDetailsMap]. This allows other
      * parts of the app to use the [SkuDetails] to show SKU information and make purchases.
      */
-    private fun onSkuDetailsResponse(billingResult: BillingResult, skuDetailsList: List<SkuDetails>?) {
+    private fun onProductDetailsResponse(billingResult: BillingResult, productDetailsList: List<ProductDetails>?) {
         val responseCode = billingResult.responseCode
         val debugMessage = billingResult.debugMessage
         when (responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 Log.i(TAG, "onSkuDetailsResponse: $responseCode $debugMessage")
-                if (skuDetailsList == null || skuDetailsList.isEmpty()) {
+                if (productDetailsList == null || productDetailsList.isEmpty()) {
                     Log.e(
                         TAG,
                         "onSkuDetailsResponse: " +
@@ -147,11 +154,11 @@ class StoreManager private constructor(
                                 "in the Google Play Console."
                     )
                 } else {
-                    for (skuDetails in skuDetailsList) {
-                        val sku = skuDetails.sku
-                        val detailsMutableFlow = skuDetailsMap[sku]
-                        detailsMutableFlow?.tryEmit(skuDetails)
-                            ?: Log.e(TAG, "Unknown sku: $sku")
+                    for (productDetails in productDetailsList) {
+                        val productId = productDetails.productId
+                        val detailsMutableFlow = productDetailsMap[productId]
+                       detailsMutableFlow?.tryEmit(productDetails)
+                            ?: Log.e(TAG, "Unknown productId: $productId")
                     }
                 }
             }
@@ -170,10 +177,10 @@ class StoreManager private constructor(
                 Log.wtf(TAG, "onSkuDetailsResponse: $responseCode $debugMessage")
             else -> Log.wtf(TAG, "onSkuDetailsResponse: $responseCode $debugMessage")
         }
-        if (responseCode == BillingClient.BillingResponseCode.OK) {
-            skuDetailsResponseTime = SystemClock.elapsedRealtime()
+        skuDetailsResponseTime = if (responseCode == BillingClient.BillingResponseCode.OK) {
+            SystemClock.elapsedRealtime()
         } else {
-            skuDetailsResponseTime = -SKU_DETAILS_REQUERY_TIME
+            -SKU_DETAILS_REQUERY_TIME
         }
     }
 
@@ -232,17 +239,32 @@ class StoreManager private constructor(
         val updatedSkus = HashSet<String>()
         if (null != purchases) {
             for (purchase in purchases) {
-                for (sku  in purchase.skus) {
-                    val skuStateFlow = skuStateMap[sku]
+                // If forgot to check "Remove entitlement" check box,
+                // - uncomment last commented line below
+                // - run app.
+                // - locate adb - on my machine it is located at:
+                // C:\Users\Christopher\AppData\Local\Android\Sdk\platform-tools
+                // - so running following command in Android Studio Command Terminal should get you there:
+                // cd ..\..\AppData\Local\Android\Sdk\platform-tools
+                // - Run command line in Android Studio Command Terminal:
+                // adb -s R58MC2Q1XQA shell pm clear com.android.vending
+                // R58MC2Q1XQA is name of my device - yours will be something else.
+                // Run "adb devices" to find out what your device is called.
+                // Running this command should set button to buy. If not shown as buy, run command again (you probably ran it before app)
+                // Run app and buy!
+                // Don't forget to re-comment line below:
+                // testConsumePurchase(purchase)
+                for (product  in purchase.products) {
+                    val skuStateFlow = skuStateMap[product]
                     if (null == skuStateFlow) {
                         Log.e(
                             TAG,
-                            "Unknown SKU " + sku + ". Check to make " +
+                            "Unknown product " + product + ". Check to make " +
                                     "sure SKU matches SKUS in the Play developer console."
                         )
                         continue
                     }
-                    updatedSkus.add(sku)
+                    updatedSkus.add(product)
                 }
                 // Global check to make sure all purchases are signed correctly.
                 // This check is best performed on your server.
@@ -267,10 +289,10 @@ class StoreManager private constructor(
                                     .build()
                             )
                             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                                Log.e(TAG, "Error acknowledging purchase: ${purchase.skus}")
+                                Log.e(TAG, "Error acknowledging purchase: ${purchase.products}")
                             } else {
                                 // purchase acknowledged
-                                for (sku in purchase.skus) {
+                                for (sku in purchase.products) {
                                     setSkuState(sku, SkuState.SKU_STATE_PURCHASED_AND_ACKNOWLEDGED)
                                 }
                             }
@@ -311,7 +333,7 @@ class StoreManager private constructor(
      * @param purchase an up-to-date object to set the state for the Sku
      */
     private fun setSkuStateFromPurchase(purchase: Purchase) {
-        for (purchaseSku in purchase.skus) {
+        for (purchaseSku in purchase.products) {
             val skuStateFlow = skuStateMap[purchaseSku]
             if (null == skuStateFlow) {
                 Log.e(
@@ -386,7 +408,8 @@ class StoreManager private constructor(
             // this line missing in monster sample
             //    reconnectMilliseconds = RECONNECT_TIMER_START_MILLISECONDS
                 defaultScope.launch {
-                    querySkuDetailsAsync()
+                    //querySkuDetailsAsync()
+                    queryProductDetailsAsync()
                     refreshPurchases()
                 }
             }
@@ -400,8 +423,12 @@ class StoreManager private constructor(
   */
     private suspend fun refreshPurchases() {
         Log.d(TAG, "Refreshing purchases.")
-        val purchasesResult = billingClient.queryPurchasesAsync(BillingClient.SkuType.INAPP)
-        var billingResult = purchasesResult.billingResult
+        val purchasesResult = billingClient.queryPurchasesAsync(
+            QueryPurchasesParams.newBuilder()
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
+        )
+        val billingResult = purchasesResult.billingResult
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             Log.e(TAG, "Problem getting purchases: " + billingResult.debugMessage)
         } else {
@@ -410,8 +437,6 @@ class StoreManager private constructor(
         Log.d(TAG, "Refreshing purchases finished.")
     }
 
-//    fun getNewPurchases() = newPurchaseFlow.asSharedFlow()
-
     /**
      * Launch the billing flow. This will launch an external Activity for a result, so it requires
      * an Activity reference. For subscriptions, it supports upgrading from one SKU type to another
@@ -419,42 +444,30 @@ class StoreManager private constructor(
      *
      * @param activity active activity to launch our billing flow from
      * @param sku SKU (Product ID) to be purchased
-     * @param upgradeSkusVarargs SKUs that the subscription can be upgraded from
+ //   * @param upgradeSkusVarargs SKUs that the subscription can be upgraded from
      * @return true if launch is successful
      */
-    fun launchBillingFlow(activity: Activity?, sku: String, vararg upgradeSkusVarargs: String) {
-        val skuDetails = skuDetailsMap[sku]?.value
-        if (null != skuDetails) {
-            val billingFlowParamsBuilder = BillingFlowParams.newBuilder()
-            billingFlowParamsBuilder.setSkuDetails(skuDetails)
-            //val upgradeSkus = arrayOf(*upgradeSkusVarargs)
-            defaultScope.launch {
-                val br = billingClient.launchBillingFlow(
-                    activity!!,
-                    billingFlowParamsBuilder.build()
-                )
-                if (br.responseCode == BillingClient.BillingResponseCode.OK) {
-                    //billingFlowInProcess.emit(true)
-                } else {
-                    Log.e(TAG, "Billing failed: + " + br.debugMessage)
-                }
-            }
-        } else {
-            Log.e(TAG, "SkuDetails not found for: $sku")
-        }
-    }
-
-    // define launchBillingFlow which will open the window at the bottom to purchase
-    //  the product
     fun launchBillingFlow(activity: Activity, sku: String) {
-        val skuDetails = skuDetailsMap[sku]?.value
-        if (null != skuDetails) {
-            val flowParams = BillingFlowParams.newBuilder()
-                .setSkuDetails(skuDetails)
-                .build()
-            billingClient.launchBillingFlow(activity, flowParams)
+        val productDetails = productDetailsMap[sku]?.value
+
+        if (productDetails != null) {
+            val productDetailsParamsList =
+                listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .build()
+                )
+
+            val billingFlowParams =
+                BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
+                    .build()
+
+// Launch the billing flow
+          //  val billingResult =
+            billingClient.launchBillingFlow(activity, billingFlowParams)
         }
-        Log.e(TAG, "SkuDetails not found for: $sku")
+        Log.e(TAG, "ProductDetails not found for: $sku")
     }
 
     /**
@@ -476,7 +489,7 @@ class StoreManager private constructor(
      * @return a Flow that observes the SKUs purchase state
      */
     fun canPurchase(sku: String): Flow<Boolean> {
-        val skuDetailsFlow = skuDetailsMap[sku]!!
+        val skuDetailsFlow = productDetailsMap[sku]!!
         val skuStateFlow = skuStateMap[sku]!!
 
         return skuStateFlow.combine(skuDetailsFlow) { skuState, skuDetails ->
@@ -490,23 +503,38 @@ class StoreManager private constructor(
      * @return title of the requested SKU as an observable Flow<String>
     </String> */
     fun getSkuTitle(sku: String): Flow<String> {
-        val skuDetailsFlow = skuDetailsMap[sku]!!
+        val skuDetailsFlow = productDetailsMap[sku]!!
         return skuDetailsFlow.mapNotNull { skuDetails ->
             skuDetails?.title
         }
     }
 
     fun getSkuPrice(sku: String): Flow<String> {
-        val skuDetailsFlow = skuDetailsMap[sku]!!
+        val skuDetailsFlow = productDetailsMap[sku]!!
         return skuDetailsFlow.mapNotNull { skuDetails ->
-            skuDetails?.price
+            skuDetails?.oneTimePurchaseOfferDetails?.formattedPrice
         }
     }
 
+    /*
     fun getSkuDescription(sku: String): Flow<String> {
         val skuDetailsFlow = skuDetailsMap[sku]!!
         return skuDetailsFlow.mapNotNull { skuDetails ->
             skuDetails?.description
         }
     }
+    */
+
+    /*
+    // DO NOT REMOVE THIS
+    // From http://47.112.232.56/a/stackoverflow/en/628e01c833132b4cf260f265.html
+    private fun testConsumePurchase(purchase: Purchase) {
+        val params = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+        billingClient.consumeAsync(params) { _, _ ->
+           // Timber.w("Consumed!")
+        }
+    }
+     */
 }

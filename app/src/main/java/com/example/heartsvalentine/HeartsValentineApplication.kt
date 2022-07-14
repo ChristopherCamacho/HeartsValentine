@@ -18,11 +18,8 @@
 
 package com.example.heartsvalentine
 import android.app.Application
-import com.example.heartsvalentine.billing.SKU_EMOJI
-import com.example.heartsvalentine.billing.SKU_MAINFRAME_SHAPES
-import com.example.heartsvalentine.billing.SKU_SYMBOLS_AND_COLOURS
+import com.example.heartsvalentine.billing.*
 import kotlinx.coroutines.GlobalScope
-import com.example.heartsvalentine.billing.StoreManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 @DelicateCoroutinesApi

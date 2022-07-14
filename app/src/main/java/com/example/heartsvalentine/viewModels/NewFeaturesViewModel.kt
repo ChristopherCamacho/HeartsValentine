@@ -2,10 +2,7 @@ package com.example.heartsvalentine.viewModels
 
 import androidx.lifecycle.*
 import com.example.heartsvalentine.R
-import com.example.heartsvalentine.billing.SKU_EMOJI
-import com.example.heartsvalentine.billing.SKU_MAINFRAME_SHAPES
-import com.example.heartsvalentine.billing.SKU_SYMBOLS_AND_COLOURS
-import com.example.heartsvalentine.billing.StoreManager
+import com.example.heartsvalentine.billing.*
 import java.util.HashMap
 
 class NewFeaturesViewModel(private val storeManager: StoreManager) : ViewModel() {
