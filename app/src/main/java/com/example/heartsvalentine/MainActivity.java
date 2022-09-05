@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     HashMap<String, String> hplFileNameMap = new HashMap<>();
     HashMap<String, String> fileNameHplMap = new HashMap<>();
     HeartValParameters hvp = new HeartValParameters();
-  //  private MainActivityViewModel mainActivityViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

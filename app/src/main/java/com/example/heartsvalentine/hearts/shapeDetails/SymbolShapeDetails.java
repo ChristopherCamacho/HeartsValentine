@@ -81,6 +81,9 @@ public class SymbolShapeDetails implements ShapeDetails {
 
     @Override
     public int getClosestDistance() {
+        if (symbol == "█●▬")
+            return 200;
+
         return 150;
     }
 }

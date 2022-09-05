@@ -58,7 +58,7 @@ public class ShapeTableCtrl extends View implements View.OnClickListener{
             shapeCellCtrlList.add(scc);
         }
 
-        String remainingSymbols = "✪⍟⎈❉❋✺✹✸✶✷✵✲✱✦⊛⁕❃❂✼⨳✚❖✜";
+        String remainingSymbols = "✪⍟⎈❉❋✺✹✸✶✷✵✲✱✦⊛⁕❃❂✼⨳✚❖✜֎֍†‡•◙█●▬★";
 
         for (int idx = 0; idx < remainingSymbols.length(); idx++) {
             char chr = remainingSymbols.charAt(idx);
